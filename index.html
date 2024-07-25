@@ -1,0 +1,919 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Tailwind CSS Project</title>
+  <link href="output.css" rel="stylesheet">
+  <link
+  href="https://fonts.googleapis.com/css2?family=Poppins:wght@100;200;300;400;500;600;700;800;900&display=swap"
+  rel="stylesheet"
+/>
+
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+
+
+<style>
+  @media (max-width: 768px) {
+    #chatSections {
+      display: none;
+    }
+  }
+
+  @media (min-width: 768px) {
+    #popup {
+      display: none;
+    }
+  }
+
+
+  .selected-contact {
+    background-color: #f0f0f0;
+  }
+
+  .chat-container {
+      display: flex;
+      flex-direction: column;
+      height: 60vh;
+    }
+
+    .messages {
+      flex-grow: 1;
+      overflow-y: auto;
+      padding: 1rem;
+    }
+
+    .input-section {
+      padding: 1rem;
+      border-top: 1px solid #ccc;
+    }
+</style>
+
+
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-app.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.6.0/firebase-firestore.js"></script>
+
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+
+
+
+<script src="script.js" defer></script> 
+
+
+
+
+</head>
+<body>
+  <div class=" w-full flex  flex-col overflow-hidden ">
+
+    <!-- header  -->
+     
+    <div class=" flex justify-center w-full"> 
+
+ 
+    <div class=" w-full  max-w-7xl p-2 flex justify-between items-center">
+
+        <div class=" lg:hidden flex  justify-between  w-full items-center">
+
+            <h1 class=" text-lg"> LLL</h1>
+            
+            <h1 class=" text-lg"> HHH</h1>
+        </div>
+        
+        <div class=" lg:flex hidden"> 
+            <h1 class="  font-poppins font-medium "> Smart Event Organizer </h1>
+        </div>
+
+        <div class=" lg:flex hidden items-center font-poppins  font-medium gap-4">
+            <span> Home </span>
+            <span>Event</span>
+            <span>Task</span>
+            <span>Calender</span>
+            <span>Chatting</span>
+            <div id="loginSignupButtons" class=" flex gap-2  item "> 
+
+       
+            <div class=" flex justify-center"> 
+                <button id="openLogin" class="  rounded-full p-1 border-black"> LOG IN</button>
+            </div>
+
+            <div class=" flex justify-center"> 
+                <button id="openSignup" class="  rounded-full p-1 border-black"> SIGN UP</button>
+            </div>
+
+          </div>
+
+            <div id="logoutButton" class=" hidden justify-center"> 
+              <button  id="logout" class="  rounded-full p-1 underline border-black"> Log Out</button>
+          </div>
+        </div>
+        
+    </div>
+
+</div>
+
+       <!-- header  ends -->
+        
+       <!-- cover image bg  -->
+
+       <div class=" relative h-[500px] w-full  ">
+
+        <img   src="./images/cover.png" class=" absolute w-full h-full   object-cover"  >
+
+        <div class=" flex flex-col justify-center w-full absolute  lg:p-0 p-2    z-[100] items-center h-full"> 
+            
+            <div class=" flex flex-col  items-center gap-3"> 
+
+         
+            <h1 class="  text-white font-semibold text-center text-5xl font-poppins">Discover the latest events </h1>
+        <p class=" max-w-xl text-white font-poppins text-center">  Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on 
+            meaningful content.</p>
+        
+            <!-- <div class=" flex  gap-4 items-center">
+
+                <div>
+                    <button class=" bg-[#0043E2] font-poppins  font-normal px-10 py-2 text-white rounded-md"> New event </button>
+                </div>
+
+                
+                <div>
+                    <button class=" bg-transparent border-white border font-poppins  font-normal px-7 py-2 text-white rounded-md"> Cancel event </button>
+                </div>
+
+            </div> -->
+       
+        </div>
+         
+
+        <!-- the next part search date and event type search  -->
+        <!-- justify-between -->
+        <div class=" max-w-lg w-full  flex  gap-10 bg-[#5c585762]  mt-5  rounded-lg   p-6 h-fit items-center backdrop-blur-xl">
+
+            <input  id="searchInputLg" class=" flex-1 outline-none hidden lg:flex text-white bg-transparent" placeholder="Search by name or type event" >
+            <input id="searchInputSm" class="  max-w-lg flex-1   outline-none   lg:hidden text-white bg-transparent " placeholder="Search" >
+            
+
+            <!-- <p class=" text-white/50 border-l pl-6   "> Date</p> -->
+
+            <!-- <div class=" flex-1 lg:flex hidden justify-between border-l pl-6  text-white/50  items-center"> 
+
+                <p class=" "> Type of event</p>
+               
+
+                <p class=""> SS</p>
+
+            </div> -->
+<!-- 
+            <div class=" flex flex-1 lg:hidden justify-between  border-l pl-6  text-white/50  items-center"> 
+
+                <p class="  "> Event</p>
+             
+
+                <p class=" "> SS</p>
+
+            </div> -->
+
+           
+            
+            <!-- <p id="searchButton" class=" "> SS</p> -->
+            <button id="searchButton" class="bg-[#0043E2] text-white p-2 rounded-md px-4">Search</button>
+
+        </div>
+
+        <!-- the next part search date and event type search  -->
+
+
+        </div>
+       </div>
+
+       <!-- cover image bg  ends -->
+
+
+       <!-- events section  -->
+         
+
+       <!-- show events available for search  -->
+        <div class=" flex w-full justify-center">
+          <div class=" w-full max-w-7xl p-4"> 
+            <div id="searchResults" class="mt-4    grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+          </div> 
+
+        </div>
+     
+       <!-- show events available for search  -->
+
+
+       <div class=" flex w-full justify-center">
+        
+        
+        <div class=" w-full authenticated-content hidden max-w-7xl p-4">
+            
+            <div class=" flex justify-between items-center">
+
+                <h1 class=" text-xl font-poppins  font-semibold"> Events</h1>
+
+                <p>View All </p>
+
+            </div>
+
+            <h1 class=" w-full text-slate-400 font-poppins text-sm max-w-2xl"> Lorem ipsum is a placeholder text commonly used to demonstrate the visual form of a document or a typeface without relying on meaningful content..... </h1>
+ 
+
+          <!-- the grids  -->
+            <div id="container" class=" grid xl:grid-cols-4 md:grid-cols-3 sm:grid-cols-2 z-[200]  mt-10  gap-5"> 
+          
+
+                  <!-- <div class="relative w-full h-[280px]">
+        <img class="w-full h-full absolute object-cover" src="${BASE_URL}${registration.image}" alt="${registration.eventName}">
+        <div class="absolute z-10 flex px-2 top-3 w-full"> 
+          <div class="flex justify-between items-center w-full">
+            <p class="bg-[#92A5EF] text-white px-3 py-[3px] rounded-sm text-sm">New</p>
+            <div class="bg-white px-5 py-1 rounded-lg flex flex-col items-center">
+              <p class="text-black">${day}</p>
+              <p class="text-gray-400 font-thin">${month}</p>
+            </div>
+          </div>
+        </div>
+        <div class="absolute z-10 p-2 flex bottom-3 w-full"> 
+          <div class="flex bg-white rounded-md flex-col gap-2 p-2 w-full">
+            <p class="text-black font-poppins text-sm">${registration.eventName}</p>
+            <div class="w-full flex flex-col gap-2 items-center">
+              <div class="flex gap-2 w-full items-center text-xs font-poppins"> 
+                <p>${registration.location}</p>
+                <div class="w-2 h-2 rounded-full bg-gray-200"></div>
+                <p>${registration.time}</p>
+              </div>
+            <button class="admin-chat-button bg-[#0043E2] text-white font-poppins py-2 px-4 text-xs rounded-md lg:w-fit w-full" data-email="${registration.admin}">
+      Admin Chat
+    </button>
+              <div class="w-full">
+                <button class="bg-[#0043E2] text-white break-all font-poppins py-2 px-4 text-xs rounded-md lg:w-fit w-full">Download</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div> -->
+
+                
+
+
+              
+
+            </div>
+
+              <!-- the grids  -->
+       
+       
+        </div>
+        
+       </div>
+
+       
+       <!-- events section  ends -->
+
+<!-- create event  -->
+
+       <div class="  authenticated-content mt-16 pb-10 flex flex-col items-center">
+
+        <h1 class=" font-poppins text-3xl font-semibold text-center"> Create an event or edit an Event</h1>
+
+      <p class=" mt-4 font-poppins text-lg max-w-lg text-center">Lorem ipsum dolor sit amet consectetur. Habitant ut et varius nunc id. Duis tristique nunc morbi ultrices egestas  </p>
+
+      <!-- <button  class="bg-blue-500 text-white px-4 py-2 mt-5"></button> -->
+      
+      <div class=" flex lg:flex-row flex-col  lg:p-0 p-2 mt-8 gap-4"> 
+        
+        <img class="  w-full lg:w-6/12 h-full" src="/images/Left.png">
+
+        <div class=" border p-2 flex flex-col gap-3 h-fit w-full rounded-md">
+          
+          <!-- <input placeholder="Event Name" class=" w-full border p-2 outline-none">
+            <input placeholder="Date" class=" w-full border p-2 outline-none">
+
+            <input placeholder="Time" class=" w-full border p-2 outline-none">
+            <input placeholder="Location" class=" w-full border p-2 outline-none">
+            <input type="file" > -->
+            <!-- <textarea class=" w-full border  p-2 h-24" placeholder="Description"></textarea> -->
+          
+
+            <input id="eventName" placeholder="Event Name" class="w-full border p-2 outline-none">
+           <div class=" flex flex-col gap-1 "> 
+
+       <label class=" text-slate-400 font-poppins text-sm"> Date </label>
+            <input id="eventDate" type="date" placeholder="Date" class="w-full border p-2 outline-none">
+          </div>
+          
+          <div class=" flex flex-col gap-1 "> 
+
+           
+            <label class=" text-slate-400 font-poppins text-sm" > Time </label>
+          <input id="eventTime"  type="time" placeholder="Time" class="w-full border p-2 outline-none">
+        </div> 
+          
+          <input id="eventLocation" placeholder="Location" class="w-full border p-2 outline-none">
+            <input id="eventImage" type="file" class="w-full border p-2 outline-none">
+            <div id="errorMessage" class="text-red-500 hidden"></div>
+
+            <div class=" flex justify-center gap-3 mt-3">
+
+                <button id="createEventBtn" class=" font-poppins bg-[#0043E2] text-white p-2 rounded-md px-4">Create Event </button>
+                <!-- <button class=" border bg-transparent p-2 rounded-md px-6">Edit Event </button> -->
+                
+            </div>
+
+
+
+        </div>
+
+
+      </div>
+    
+    
+    </div>
+
+
+       <!-- create event  -->
+
+
+
+       <!-- table for task  -->
+        <div class=" flex justify-center w-full" > 
+
+       
+       <div class="  authenticated-content max-w-7xl w-full  p-4">
+        <h1 class="text-3xl font-bold mb-2">Your Events</h1>
+        <p class="mb-4  font-poppins text-slate-700">All events that you created are listed below</p>
+        
+        <!-- <button class="mb-4 px-4 py-2 bg-gray-200 rounded-md">Create a new Task</button> -->
+        
+        <div class="overflow-x-auto">
+          <table id="eventsTable" class="min-w-full bg-white">
+            <thead class="bg-blue-500 text-white">
+              <tr>
+                <th class="w-1/4 text-left py-3 px-4 uppercase font-semibold text-sm">Event</th>
+                <th class="w-1/4 text-left py-3 px-4 uppercase font-semibold text-sm">Time</th>
+                <th class="w-1/4 text-left py-3 px-4 uppercase font-semibold text-sm">Date</th>
+                <th class="w-1/4 text-left py-3 px-4 uppercase font-semibold text-sm">People Registered</th>
+                <th class="w-1/4 text-left py-3 px-4 uppercase font-semibold text-sm">Action </th>
+              </tr>
+            </thead>
+            <tbody id="eventsBody" class="text-gray-700">
+        
+            </tbody>
+          </table>
+        </div>
+      </div>
+
+      </div>
+       <!-- table for task  -->
+
+
+
+
+       <!-- CALENDER  -->
+        <!-- <div class=" relative"> 
+       <div class="max-w-7xl mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-2">Calendar</h1>
+        <div class="flex items-center space-x-4 mb-4">
+          <button class="px-4 py-2 bg-gray-200 rounded-md">Today</button>
+          <input type="text" id="dateRange" class="px-4 py-2 border rounded-md">
+          <div class="flex items-center space-x-2">
+            <span>9 March - 31 Oct 2024</span>
+            <button class="px-2 py-1 bg-gray-200 rounded-md">&lt;</button>
+            <button class="px-2 py-1 bg-gray-200 rounded-md">&gt;</button>
+          </div>
+        </div>
+        
+        <div class=" w-full flex lg:flex-row flex-col  gap-3"> 
+
+
+   
+           <div class="flex flex-col w-full lg:order-1 order-2 lg:w-8/12 space-y-4">
+            <div class="flex items-center bg-white p-4 rounded-md shadow">
+              <img src="https://via.placeholder.com/150" class="w-32 h-32 object-cover rounded-md mr-4">
+              <div>
+                <h2 class="text-xl font-semibold">Event Name</h2>
+                <p class="text-gray-600">12 April 2023</p>
+                <p class="text-gray-600">All Days</p>
+              </div>
+            </div>
+            <div class="flex items-center bg-white p-4 rounded-md shadow">
+              <img src="https://via.placeholder.com/150" class="w-32 h-32 object-cover rounded-md mr-4">
+              <div>
+                <h2 class="text-xl font-semibold">Event Name</h2>
+                <p class="text-gray-600">12 April 2023</p>
+                <p class="text-gray-600">All Days</p>
+              </div>
+            </div>
+            <div class="flex items-center bg-white p-4 rounded-md shadow">
+              <img src="https://via.placeholder.com/150" class="w-32 h-32 object-cover rounded-md mr-4">
+              <div>
+                <h2 class="text-xl font-semibold">Event Name</h2>
+                <p class="text-gray-600">12 April 2023</p>
+                <p class="text-gray-600">All Days</p>
+              </div>
+            </div>
+          </div>
+     
+
+           <div class=" bg-white w-full  flex  flex-col items-center   lg:order-2 order-1 lg:w-4/12 p-4 rounded-md ">
+            <div class=" w-full bg-black" id="inline-picker"></div>
+            <div class=" w-full flex justify-center gap-4 "> 
+
+           
+            <button class="mt-4 px-5  py-2 bg-blue-500 text-white rounded-md">Cancel</button>
+            <button class="mt-4  px-5  py-2 bg-blue-500 text-white rounded-md">Set date</button>
+          </div>
+          </div>
+
+        </div>
+       
+      </div>
+      
+ 
+
+
+    </div> -->
+
+    <div class="relative">
+      <div class="max-w-7xl mx-auto p-4">
+        <h1 class="text-3xl font-bold mb-2">Calendar</h1>
+        <div class="flex  lg:flex-row flex-col lg:items-center lg:gap-0 gap-3 space-x-4 mb-4">
+          <div class=" flex items-center space-x-4 "> 
+
+        
+          <button id="todayButton" class="px-4 py-2 bg-gray-200 rounded-md">Today</button>
+          <input type="text" id="dateRange" class="px-4 py-2 border rounded-md">
+        </div>
+          <div class="flex items-center space-x-2">
+            <span id="dateDisplay">9 March - 31 Oct 2024</span>
+            <button id="prevButton" class="px-2 py-1 bg-gray-200 rounded-md">&lt;</button>
+            <button id="nextButton" class="px-2 py-1 bg-gray-200 rounded-md">&gt;</button>
+          </div>
+        </div>
+        
+        <div class="w-full flex lg:flex-row flex-col gap-3">
+          <!-- Event List -->
+          <div id="eventList" class=" flex-col w-full hidden lg:order-1 order-2 lg:w-8/12 space-y-4">
+            <!-- Event items will be dynamically injected here -->
+             <h1> Select a date or range to search events </h1>
+          </div>
+    
+          <!-- Inline Picker -->
+          <div class="bg-white w-full flex flex-col items-center lg:order-2 order-1 lg:w-4/12 p-4 rounded-md">
+            <div class="w-full bg-black" id="inline-picker"></div>
+            <div class="w-full flex justify-center gap-4">
+              <button class="mt-4 px-5 py-2 bg-blue-500 text-white rounded-md">Cancel</button>
+              <button class="mt-4 px-5 py-2 bg-blue-500 text-white rounded-md">Set date</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+        <!-- CALENDER  -->
+
+
+        <!-- chat screen  -->
+        <div id="chatSection" class="justify-center">
+          <div class="max-w-7xl w-full">
+            <h1 class="font-semibold font-poppins text-xl p-4">Chatting</h1>
+            <div class="container">
+              <div class="flex flex-col border m-2 md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
+                <div class="w-full md:w-1/3 border-r border-gray-200 p-2">
+                  <!-- <div class="mb-4">
+                    <input type="text" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Search by Name or phrase">
+                  </div> -->
+                  <div id="contactList" class="contact-list">
+                    <!-- Contacts will be dynamically inserted here -->
+                  </div>
+                </div>
+                <div id="chatContainer" class=" md:w-2/3 flex flex-col h-full">
+                  <div class="messages chat-container">
+                    <div class="chat lg:flex-grow overflow-y-auto"></div>
+                  </div>
+                  <div class="input-section flex items-center p-4">
+                    <input id="messageInput" type="text" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Type a message">
+                    <button id="sendMessage" class="ml-4 p-2 bg-blue-500 text-white rounded-lg">Send</button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>  
+
+        <!-- chat screen  -->
+
+
+
+
+
+        <!-- PERSONAL INFORMATION  -->
+
+        <div class="  authenticated-content flex border-t justify-center pb-11 mt-10 w-full">
+          
+          <div class="max-w-7xl w-full p-4">
+            <div class="flex lg:justify-between border-b pb-2 items-center">
+              <h1 class="font-poppins font-semibold text-xl">Personal Informations</h1>
+           
+            </div>
+            
+            <div class="w-full flex mt-10 justify-center">
+              <div class="flex lg:flex-row flex-col max-w-4xl  lg:items-center gap-6 w-full">
+                <img id="profile-image" src="https://via.placeholder.com/200" class="rounded-full w-[200px] h-[200px] object-cover">
+                <input type="file" id="image-upload" class="hidden" />
+              </div>
+            </div>
+          
+            <div class="w-full flex mt-10 justify-center">
+              <div class="flex flex-col max-w-4xl w-full">
+                <div class="grid lg:grid-cols-2 w-full gap-5 md:grid-cols-1">
+                  <div> 
+                    <h1>Name</h1>
+                    <p id="name-display" class="p-2 border rounded-md"></p>
+                    <input id="name-input" class="w-full outline-none border rounded-md p-2 hidden" />
+                  </div>
+                  <div> 
+                    <h1>Last Name</h1>
+                    <p id="last-name-display" class="p-2 border rounded-md"></p>
+                    <input id="last-name-input" class="w-full outline-none border rounded-md p-2 hidden" />
+                  </div>
+                  <div> 
+                    <h1>Date Of Birth</h1>
+                    <p id="dob-display" class="p-2 border rounded-md"></p>
+                    <input id="dob-input" type="date" class="w-full outline-none border rounded-md p-2 hidden" />
+                  </div>
+                  <div> 
+                    <h1>Phone Number</h1>
+                    <p id="phone-display" class="p-2 border rounded-md"></p>
+                    <input id="phone-input" class="w-full outline-none border rounded-md p-2 hidden" />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class=" w-full flex justify-center"> 
+          
+            <div class=" max-w-4xl mt-9 w-full"> 
+
+         
+            <button id="edit-button" class="bg-black text-white py-1 px-5 rounded-md font-poppins">Edit</button>
+            <button id="save-button" class="bg-black text-white py-1 px-5 rounded-md font-poppins hidden">Save Changes</button>
+          </div>
+
+        </div>
+
+           
+          </div>
+          
+
+        </div>
+
+        <!-- PERSONAL INFORMATION  -->
+
+         <!-- footer  -->
+         <div class=" w-full  bg-[#2A2A2A]  p-5 text-white flex justify-center">
+              
+          <div class=" max-w-7xl w-full">
+            
+            <div class=" grid md:grid-cols-1 lg:grid-cols-5 gap-3">
+              
+              <h1> Smart Event Organizer</h1>
+              
+
+              <div class=" flex flex-col gap-4">
+
+                <h1> Home </h1>
+                <h1> Calender </h1>
+
+              </div>
+
+
+              
+              <div class=" flex flex-col gap-4">
+
+                <h1> Event </h1>
+                <h1> Setting </h1>
+
+              </div>
+
+
+              <div class=" flex flex-col gap-4">
+
+                <h1>Task </h1>
+                <h1> Impressum </h1>
+
+              </div>
+
+
+              <div class=" flex flex-col gap-4">
+
+                <h1> Join our community </h1>
+               <div class=" flex items-center border-white border ">
+                <input class=" flex-1 p-2 bg-transparent outline-none rounded-full  placeholder:text-white" placeholder="Enter your email">
+               <div class="  w-4 h-4 rounded-full border border-white">
+
+               </div> 
+              </div>
+
+              </div>
+
+            </div>
+
+            <!-- border  -->
+             <div class=" border-b w-full border-white mt-8"> </div>
+            <!-- border  -->
+
+            <div class=" mt-4"> 
+              <h1 class=" font-poppins text-sm">Copyright © 2022 B EVENT LLC. All rights reserved </h1>
+            </div>
+
+          </div>
+
+         </div>
+        <!-- footer  -->
+
+
+        <div id="confirmationModal" class="fixed inset-0 bg-gray-800 bg-opacity-50  z-[500]   items-center justify-center hidden">
+          <div class="bg-white p-4 rounded-lg shadow-lg w-80">
+            <h3 class="text-lg font-semibold mb-4">Confirm Registration</h3>
+            <p>Are you sure you want to register for this event?</p>
+            <div class="mt-4 flex justify-end">
+              <button id="confirmButton" class="bg-blue-500 text-white px-4 py-2 rounded mr-2">Yes</button>
+              <button id="cancelButton" class="bg-gray-300 px-4 py-2 rounded">No</button>
+            </div>
+          </div>
+        </div>
+
+
+
+
+        <!-- login and sign up model -->
+        <div id="loginModal" class="fixed inset-0 flex  z-[1000]  items-center justify-center bg-black bg-opacity-50 hidden">
+          <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
+            <button id="closeLogin" class="absolute top-2 z-[2000] right-2 text-gray-500 hover:text-gray-700">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Login</h2>
+            <form id="loginForm" class="space-y-4">
+              <div>
+                <label for="loginEmail" class="block text-gray-700">Email:</label>
+                <input type="email" id="loginEmail" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <p id="loginEmailError" class="text-red-500 text-xs mt-1"></p>
+              </div>
+              <div>
+                <label for="loginPassword" class="block text-gray-700">Password:</label>
+                <input type="password" id="loginPassword" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <p id="loginPasswordError" class="text-red-500 text-xs mt-1"></p>
+              </div>
+              <button type="submit" class="w-full px-4 py-2 bg-blue-500 text-white rounded-md hover:bg-blue-600">Login</button>
+            </form>
+          </div>
+        </div>
+      
+        <!-- Signup Modal -->
+        <div id="signupModal" class="fixed inset-0 z-[1000] flex   items-center justify-center bg-black bg-opacity-50 hidden">
+          <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
+            <button id="closeSignup" class="absolute top-2 z-[2000] right-2 text-gray-500 hover:text-gray-700">&times;</button>
+            <h2 class="text-xl font-semibold mb-4">Signup</h2>
+            <form id="signupForm" class="space-y-4">
+              <div>
+                <label for="signupName" class="block text-gray-700">Name:</label>
+                <input type="text" id="signupName" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <p id="signupNameError" class="text-red-500 text-xs mt-1"></p>
+              </div>
+              <div>
+                <label for="signupEmail" class="block text-gray-700">Email:</label>
+                <input type="email" id="signupEmail" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <p id="signupEmailError" class="text-red-500 text-xs mt-1"></p>
+              </div>
+              <div>
+                <label for="signupPassword" class="block text-gray-700">Password:</label>
+                <input type="password" id="signupPassword" class="w-full p-2 border border-gray-300 rounded-md" required>
+                <p id="signupPasswordError" class="text-red-500 text-xs mt-1"></p>
+              </div>
+              <button type="submit" class="w-full px-4 py-2 bg-green-500 text-white rounded-md hover:bg-green-600">Signup</button>
+            </form>
+          </div>
+        </div>
+        <!-- login and sign up model  ENDS-->
+
+
+  
+         
+         
+       <script type="module">
+        import { db, collection, addDoc, query, where, orderBy, onSnapshot, getDocs } from './firebase.js';
+    
+        let currentUser = localStorage.getItem('email'); // Get logged-in user email from localStorage
+        let currentChatUser = null;
+    
+        document.addEventListener('DOMContentLoaded', () => {
+          // Load contacts from Firestore (you need to implement this part)
+          loadContacts();
+    
+          document.querySelector('#sendMessage').addEventListener('click', async () => {
+            const messageInput = document.querySelector('#messageInput');
+            const message = messageInput.value;
+            messageInput.value = '';
+            if (currentChatUser && message.trim()) {
+              await sendMessage(currentUser, currentChatUser, message);
+              displayMessage({ sender: currentUser, message, timestamp: new Date() }); // Display message immediately
+            }
+          });
+        });
+    
+        // function loadContacts() {
+       
+        //   const contacts = [
+        //     { email: 'contact1@example.com', name: 'Contact 1' },
+        //     { email: 'contact2@example.com', name: 'Contact 2' }
+        //   ];
+        //   const contactList = document.querySelector('.contact-list');
+        //   contacts.forEach(contact => {
+        //     const contactElement = document.createElement('div');
+        //     contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+        //     contactElement.dataset.email = contact.email;
+        //     contactElement.innerHTML = `
+        //       <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+        //       <div class="flex-grow">
+        //         <div class="font-bold">${contact.name}</div>
+        //       </div>
+        //     `;
+        //     contactElement.addEventListener('click', () => {
+        //       document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+        //       contactElement.classList.add('selected-contact');
+        //       currentChatUser = contact.email;
+        //       loadChatHistory(currentUser, currentChatUser); // Load chat history when a contact is selected
+        //     });
+        //     contactList.appendChild(contactElement);
+        //   });
+        // }
+
+        async function loadContacts() {
+  try {
+    const currentUser = localStorage.getItem('email'); // Get logged-in user email
+    const contactList = document.querySelector('.contact-list');
+    const contacts = new Set();
+
+    // Fetch messages where the logged-in user is either sender or receiver
+    const senderQuery = query(
+      collection(db, 'chats'),
+      where('sender', '==', currentUser)
+    );
+
+    const receiverQuery = query(
+      collection(db, 'chats'),
+      where('receiver', '==', currentUser)
+    );
+
+    const senderSnapshot = await getDocs(senderQuery);
+    senderSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.receiver !== currentUser) {
+        contacts.add(data.receiver);
+      }
+    });
+
+    const receiverSnapshot = await getDocs(receiverQuery);
+    receiverSnapshot.forEach((doc) => {
+      const data = doc.data();
+      if (data.sender !== currentUser) {
+        contacts.add(data.sender);
+      }
+    });
+
+    // Clear previous contact list
+    contactList.innerHTML = '';
+
+    // Display contacts
+    contacts.forEach((email) => {
+      const contactElement = document.createElement('div');
+      contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+      contactElement.dataset.email = email;
+      contactElement.innerHTML = `
+        <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+        <div class="flex-grow">
+          <div class="font-bold">${email}</div>
+        </div>
+      `;
+      contactElement.addEventListener('click', () => {
+        document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+        contactElement.classList.add('selected-contact');
+        currentChatUser = email;
+        loadChatHistory(currentUser, currentChatUser);
+      });
+      contactList.appendChild(contactElement);
+    });
+
+  } catch (error) {
+    console.error('Error loading contacts:', error);
+  }
+}
+    
+        async function sendMessage(sender, receiver, message) {
+          try {
+            await addDoc(collection(db, 'chats'), {
+              sender,
+              receiver,
+              message,
+              timestamp: new Date()
+            });
+          } catch (e) {
+            console.error('Error adding document: ', e);
+          }
+        }
+    
+        window.loadChatHistory = async function(user1, user2) {
+          const chatSection = document.querySelector('#chatSection .chat');
+          chatSection.innerHTML = ''; // Clear previous chat
+    
+          // Query Firestore to get chat history
+          const q1 = query(
+            collection(db, 'chats'),
+            where('sender', '==', user1),
+            where('receiver', '==', user2),
+            orderBy('timestamp', 'asc')
+          );
+    
+          const q2 = query(
+            collection(db, 'chats'),
+            where('sender', '==', user2),
+            where('receiver', '==', user1),
+            orderBy('timestamp', 'asc')
+          );
+    
+          // Use Promise.all to fetch data from both queries
+          Promise.all([
+            getDocs(q1),
+            getDocs(q2)
+          ]).then(([snapshot1, snapshot2]) => {
+            chatSection.innerHTML = ''; // Clear previous chat
+            snapshot1.forEach((doc) => {
+              const chat = doc.data();
+              displayMessage(chat);
+            });
+            snapshot2.forEach((doc) => {
+              const chat = doc.data();
+              displayMessage(chat);
+            });
+          }).catch((e) => {
+            console.error('Error loading chat history: ', e);
+          });
+        }
+
+        // real time 
+        // Ensure you add this function to the global window object
+window.listenForMessages = function(user1, user2) {
+  const chatSection = document.querySelector('#chatSection .chat');
+
+  // Real-time listener for chat messages
+  const q1 = query(
+    collection(db, 'chats'),
+    where('sender', 'in', [user1, user2]),
+    where('receiver', 'in', [user1, user2]),
+    orderBy('timestamp', 'asc')
+  );
+
+  // Attach real-time listener
+  // onSnapshot(q1, (snapshot) => {
+  //   chatSection.innerHTML = ''; // Clear previous chat
+  //   snapshot.forEach((doc) => {
+  //     const chat = doc.data();
+  //     displayMessage(chat); // Update UI with new message
+  //   });
+  // });
+
+  onSnapshot(q, (snapshot) => {
+    chatSection.innerHTML = ''; // Clear existing messages
+    snapshot.forEach((doc) => {
+      const chat = doc.data();
+      displayMessage(chat);
+    });
+  }, (error) => {
+    console.error('Error listening for messages:', error);
+  });
+};
+
+        // real time 
+    
+        function displayMessage(chat) {
+          const chatSection = document.querySelector('#chatSection .chat');
+          const messageElement = document.createElement('div');
+          messageElement.classList.add('message', 'mb-4', 'flex', 'items-start');
+          messageElement.innerHTML = `
+            <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+            <div class="${chat.sender === currentUser ? 'bg-blue-100' : 'bg-gray-100'} p-3 rounded-lg max-w-xs">
+              ${chat.message}
+              <div class="text-sm text-gray-500 mt-1">${new Date(chat.timestamp.toDate ? chat.timestamp.toDate() : chat.timestamp).toLocaleTimeString()}</div>
+            </div>
+          `;
+          chatSection.appendChild(messageElement);
+          chatSection.scrollTop = chatSection.scrollHeight; // Scroll to the bottom
+        }
+      </script>
+     
+    
+
+</body>
+</html>
