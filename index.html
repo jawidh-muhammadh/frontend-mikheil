@@ -864,34 +864,36 @@
 
         // real time 
         // Ensure you add this function to the global window object
-window.listenForMessages = function(user1, user2) {
+        window.listenForMessages = function(user1, user2) {
   const chatSection = document.querySelector('#chatSection .chat');
 
-  // Real-time listener for chat messages
   const q1 = query(
     collection(db, 'chats'),
-    where('sender', 'in', [user1, user2]),
-    where('receiver', 'in', [user1, user2]),
+    where('sender', '==', user1),
+    where('receiver', '==', user2),
     orderBy('timestamp', 'asc')
   );
 
-  // Attach real-time listener
-  // onSnapshot(q1, (snapshot) => {
-  //   chatSection.innerHTML = ''; // Clear previous chat
-  //   snapshot.forEach((doc) => {
-  //     const chat = doc.data();
-  //     displayMessage(chat); // Update UI with new message
-  //   });
-  // });
+  const q2 = query(
+    collection(db, 'chats'),
+    where('sender', '==', user2),
+    where('receiver', '==', user1),
+    orderBy('timestamp', 'asc')
+  );
 
-  onSnapshot(q, (snapshot) => {
-    chatSection.innerHTML = ''; // Clear existing messages
+  onSnapshot(q1, (snapshot) => {
+    chatSection.innerHTML = '';
     snapshot.forEach((doc) => {
       const chat = doc.data();
       displayMessage(chat);
     });
-  }, (error) => {
-    console.error('Error listening for messages:', error);
+  });
+
+  onSnapshot(q2, (snapshot) => {
+    snapshot.forEach((doc) => {
+      const chat = doc.data();
+      displayMessage(chat);
+    });
   });
 };
 

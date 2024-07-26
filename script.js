@@ -153,46 +153,39 @@ const createHtmlStructures = () => `
 
 
 
-  // get all the events of the admin 
-  document.addEventListener('DOMContentLoaded', async () => {
-    const token = localStorage.getItem('email');
-    const adminEmail = token; 
-    let editingEventId = null;
-  
-    const fetchEventsByAdmin = async (adminEmail) => {
-      try {
-        const response = await fetch(`http://localhost:5000/api/events/${adminEmail}`);
-        const events = await response.json();
-        console.log(events);
-        return events;
-      } catch (error) {
-        console.error('Error fetching events:', error);
-        return [];
-      }
-    };
-  
-    const formatDate = (dateString) => {
-      const options = { year: 'numeric', month: 'short', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString(undefined, options);
-    };
-  
-    const displayEvents = (events) => {
-      const eventsBody = document.getElementById('eventsBody');
-      eventsBody.innerHTML = ''; // Clear any existing rows
-  
-      events.forEach(event => {
-        const row = document.createElement('tr');
-        row.className = event.index % 2 === 0 ? '' : 'bg-gray-100'; // Alternate row colors
-        
-        // row.innerHTML = `
-        //   <td class="w-1/4 text-left py-3 px-4">${event.eventName}</td>
-        //   <td class="w-1/4 text-left py-3 px-4">${event.time}</td>
-        //   <td class="w-1/4 text-left py-3 px-4">${formatDate(event.date)}</td>
-        //   <td class="w-1/4 text-left py-3 px-4">${event.registeredUsers || '0'}</td>
-        //   <td class="w-1/4 text-left py-3 px-4 underline text-blue-500 cursor-pointer">Edit</td>
-        // `;
+ // get all the events of the admin 
+document.addEventListener('DOMContentLoaded', async () => {
+  const token = localStorage.getItem('email');
+  const adminEmail = token; 
+  let editingEventId = null;
+  let deletingEventId = null;
 
-        row.innerHTML = `
+  const fetchEventsByAdmin = async (adminEmail) => {
+    try {
+      const response = await fetch(`http://localhost:5000/api/events/${adminEmail}`);
+      const events = await response.json();
+      console.log(events);
+      return events;
+    } catch (error) {
+      console.error('Error fetching events:', error);
+      return [];
+    }
+  };
+
+  const formatDate = (dateString) => {
+    const options = { year: 'numeric', month: 'short', day: 'numeric' };
+    return new Date(dateString).toLocaleDateString(undefined, options);
+  };
+
+  const displayEvents = (events) => {
+    const eventsBody = document.getElementById('eventsBody');
+    eventsBody.innerHTML = ''; // Clear any existing rows
+
+    events.forEach(event => {
+      const row = document.createElement('tr');
+      row.className = event.index % 2 === 0 ? '' : 'bg-gray-100'; // Alternate row colors
+
+      row.innerHTML = `
         <td class="w-1/4 text-left py-3 px-4">
           ${editingEventId === event._id ? 
             `<input type="text" id="editEventName" value="${event.eventName}" class="border p-2" />` : 
@@ -201,57 +194,87 @@ const createHtmlStructures = () => `
         <td class="w-1/4 text-left py-3 px-4">${event.time}</td>
         <td class="w-1/4 text-left py-3 px-4">${formatDate(event.date)}</td>
         <td class="w-1/4 text-left py-3 px-4">${event.registeredUsers || '0'}</td>
-        <td class="w-1/4 text-left py-3 px-4">
+        <td class="w-1/4 text-center py-3 px-4">
           ${editingEventId === event._id ? 
-            `<button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveEvent('${event._id}')">Save</button> <button class="   px-4 py-2 rounded" onclick="cancelEdit()">Cancel</button>` :
-            `<button class="underline text-blue-500 cursor-pointer" onclick="editEvent('${event._id}', '${event.eventName}')">Edit</button>`}
+            `<button class="bg-blue-500 text-white px-4 py-2 rounded" onclick="saveEvent('${event._id}')">Save</button> 
+             <button class="px-4 py-2 rounded" onclick="cancelEdit()">Cancel</button>` :
+            deletingEventId !== event._id ? 
+            `<button class="underline text-blue-500 cursor-pointer" onclick="editEvent('${event._id}', '${event.eventName}')">Edit</button>` : ''}
+          ${deletingEventId === event._id ? 
+            `<button class="bg-red-500 text-black px-4 py-2 rounded" onclick="confirmDeleteEvent('${event._id}')">Confirm</button> 
+             <button class="px-4 py-2 rounded" onclick="cancelDelete()">Cancel</button>` :
+            editingEventId !== event._id && event.registeredUsers === 0 ? 
+            `<button class="underline text-red-500 cursor-pointer" onclick="deleteEvent('${event._id}')">Delete</button>` : ''}
         </td>
       `;
-        
-        eventsBody.appendChild(row);
+
+      eventsBody.appendChild(row);
+    });
+  };
+
+  window.editEvent = (eventId, eventName) => {
+    editingEventId = eventId;
+    deletingEventId = null; // Hide delete buttons when editing
+    displayEvents(events); // Re-render table to show edit form
+  };
+
+  window.saveEvent = async (eventId) => {
+    const newEventName = document.getElementById('editEventName').value;
+    if (!newEventName.trim()) {
+      alert('Event name cannot be empty');
+      return;
+    }
+    
+    try {
+      await fetch(`http://localhost:5000/api/events/${eventId}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ eventName: newEventName })
       });
-    };
-
-    window.editEvent = (eventId, eventName) => {
-      editingEventId = eventId;
-      displayEvents(events); // Re-render table to show edit form
-    };
-
-    window.saveEvent = async (eventId) => {
-      const newEventName = document.getElementById('editEventName').value;
-      if (!newEventName.trim()) {
-        alert('Event name cannot be empty');
-        return;
-      }
-      
-      try {
-        await fetch(`http://localhost:5000/api/events/${eventId}`, {
-          method: 'PUT',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ eventName: newEventName })
-        });
-        const events = await fetchEventsByAdmin(adminEmail);
-        editingEventId = null;
-        displayEvents(events);
-      } catch (error) {
-        console.error('Error saving event:', error);
-      }
-    };
-
-    window.cancelEdit = () => {
+      const events = await fetchEventsByAdmin(adminEmail);
       editingEventId = null;
-      displayEvents(events); // Re-render table to cancel edit
-    };
+      displayEvents(events);
+    } catch (error) {
+      console.error('Error saving event:', error);
+    }
+  };
 
-    
+  window.cancelEdit = () => {
+    editingEventId = null;
+    displayEvents(events); // Re-render table to cancel edit
+  };
 
-    
+  // delete event 
+  window.deleteEvent = (eventId) => {
+    deletingEventId = eventId;
+    editingEventId = null; // Hide edit buttons when deleting
+    displayEvents(events); // Re-render table to show delete confirmation
+  };
+
+  window.confirmDeleteEvent = async (eventId) => {
+    try {
+      await fetch(`http://localhost:5000/api/events/${eventId}`, {
+        method: 'DELETE',
+      });
+      const events = await fetchEventsByAdmin(adminEmail);
+      deletingEventId = null;
+      displayEvents(events);
+    } catch (error) {
+      console.error('Error deleting event:', error);
+    }
+  };
+
+  window.cancelDelete = () => {
+    deletingEventId = null;
+    displayEvents(events); // Re-render table to cancel delete
+  };
   
-    const events = await fetchEventsByAdmin(adminEmail);
-    displayEvents(events);
-  });
-  
-  // get all the events of the admin ends
+  const events = await fetchEventsByAdmin(adminEmail);
+  displayEvents(events);
+});
+
+
+ // get all the events of the admin 
 
 
 
@@ -1160,10 +1183,10 @@ const addAdminEmailToContactList = async(email) => {
 
      const currentUser = localStorage.getItem('email');
       
-      console.log('Current chat user set to:', currentChatUser); // Debugging log
+      console.log('Current chat user set to:', window.currentChatUser); // Debugging log
        loadChatHistory(currentUser, window.currentChatUser);
-       if (typeof window.listenForMessages === 'function') {
-        window.listenForMessages(currentUser, window.currentChatUser);
+       if (typeof listenForMessages === 'function') {
+        listenForMessages(currentUser, window.currentChatUser);
       }
 
     });
