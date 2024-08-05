@@ -92,7 +92,7 @@
             <span>Event</span>
             <span>Task</span>
             <span>Calender</span>
-            <span>Chatting</span>
+            <a href="impressum.html"><span>Impressum</span></a>
             <div id="loginSignupButtons" class=" flex gap-2  item "> 
 
        
@@ -199,6 +199,8 @@
         <div class=" flex w-full justify-center">
           <div class=" w-full max-w-7xl p-4"> 
             <div id="searchResults" class="mt-4    grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4"></div>
+         
+         
           </div> 
 
         </div>
@@ -477,20 +479,22 @@
 
 
         <!-- chat screen  -->
-        <div id="chatSection" class="justify-center">
+        <div id="chatSection" class="justify-center authenticated-content">
           <div class="max-w-7xl w-full">
             <h1 class="font-semibold font-poppins text-xl p-4">Chatting</h1>
             <div class="container">
               <div class="flex flex-col border m-2 md:flex-row bg-white shadow-lg rounded-lg overflow-hidden">
                 <div class="w-full md:w-1/3 border-r border-gray-200 p-2">
-                  <!-- <div class="mb-4">
-                    <input type="text" class="w-full p-2 border border-gray-300 rounded-lg" placeholder="Search by Name or phrase">
-                  </div> -->
                   <div id="contactList" class="contact-list">
                     <!-- Contacts will be dynamically inserted here -->
                   </div>
+                  <div id="groupChat" class="contact p-2 flex items-center border-b border-gray-200 cursor-pointer">
+                    <!-- <div class="flex-grow">
+                      <div class="font-bold">Unterhaltungs</div>
+                    </div> -->
+                  </div>
                 </div>
-                <div id="chatContainer" class=" md:w-2/3 flex flex-col h-full">
+                <div id="chatContainer" class="md:w-2/3 flex flex-col h-full">
                   <div class="messages chat-container">
                     <div class="chat lg:flex-grow overflow-y-auto"></div>
                   </div>
@@ -502,7 +506,8 @@
               </div>
             </div>
           </div>
-        </div>  
+        </div>
+        
 
         <!-- chat screen  -->
 
@@ -554,6 +559,8 @@
               </div>
             </div>
 
+         
+
             <div class=" w-full flex justify-center"> 
           
             <div class=" max-w-4xl mt-9 w-full"> 
@@ -565,6 +572,10 @@
 
         </div>
 
+           <div id="verification-status" class="w-full flex justify-center mt-5">
+              <p id="verification-message" class="text-lg font-semibold"></p>
+            </div>
+
            
           </div>
           
@@ -572,6 +583,48 @@
         </div>
 
         <!-- PERSONAL INFORMATION  -->
+
+       
+
+        <!-- CHANGE PASSWORD SECTION -->
+<div class="authenticated-content flex border-t justify-center pb-11 mt-10 w-full">
+  <div class="max-w-7xl w-full p-4">
+    <div class="flex lg:justify-between border-b pb-2 items-center">
+      <h1 class="font-poppins font-semibold text-xl">Change Password</h1>
+    </div>
+
+    <div class="w-full flex mt-10 justify-center">
+      <div class="flex flex-col max-w-4xl w-full">
+        <div class="grid lg:grid-cols-2 w-full gap-5 md:grid-cols-1">
+          <div> 
+            <h1>Old Password</h1>
+            <input id="old-password" type="password" class="w-full outline-none border rounded-md p-2" placeholder="Enter your old password" />
+          </div>
+          <div> 
+            <h1>New Password</h1>
+            <input id="new-password" type="password" class="w-full outline-none border rounded-md p-2" placeholder="Enter your new password" />
+          </div>
+          <div> 
+            <h1>Confirm New Password</h1>
+            <input id="confirm-password" type="password" class="w-full outline-none border rounded-md p-2" placeholder="Confirm your new password" />
+          </div>
+        </div>
+
+        <div class="mt-6">
+          <p id="password-change-error" class="text-red-500 hidden">Error message here</p>
+          <p id="password-change-success" class="text-green-500 hidden">Password changed successfully</p>
+        </div>
+
+        <div class="mt-10">
+          <button id="change-password-button" class="bg-black text-white py-1 px-5 rounded-md font-poppins">Change Password</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+ <!-- CHANGE PASSWORD SECTION -->
+
+
 
          <!-- footer  -->
          <div class=" w-full  bg-[#2A2A2A]  p-5 text-white flex justify-center">
@@ -699,222 +752,418 @@
         <!-- login and sign up model  ENDS-->
 
 
+        <!-- Email Verification Notification Modal -->
+<div id="verificationModal" class="fixed inset-0 flex z-[1000] items-center justify-center bg-black bg-opacity-50 hidden">
+  <div class="bg-white p-6 rounded-lg shadow-lg max-w-sm w-full relative">
+    <button id="closeVerification" class="absolute top-2 right-2 text-gray-500 hover:text-gray-700">&times;</button>
+    <h2 class="text-xl font-semibold mb-4">Check Your Email</h2>
+    <p class="text-gray-700">Please check your email and follow the instructions to verify your account. If you do not see the email, please check your spam folder.</p>
+  </div>
+</div>
+
+
+<!-- <div id="popupq" class="fixed z-[1000] inset-0 flex  hidden items-center justify-center bg-gray-800 bg-opacity-50 ">
+  <div class="bg-white p-6 rounded-lg shadow-lg text-center">
+    <span id="popup-message" class="text-lg font-semibold"></span>
+    <button id="popup-close" class="mt-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600">Close</button>
+  </div>
+</div> -->
+
+
   
          
          
-       <script type="module">
-        import { db, collection, addDoc, query, where, orderBy, onSnapshot, getDocs } from './firebase.js';
-    
-        let currentUser = localStorage.getItem('email'); // Get logged-in user email from localStorage
-        let currentChatUser = null;
-    
-        document.addEventListener('DOMContentLoaded', () => {
-          // Load contacts from Firestore (you need to implement this part)
-          loadContacts();
-    
-          document.querySelector('#sendMessage').addEventListener('click', async () => {
-            const messageInput = document.querySelector('#messageInput');
-            const message = messageInput.value;
-            messageInput.value = '';
-            if (currentChatUser && message.trim()) {
-              await sendMessage(currentUser, currentChatUser, message);
-              displayMessage({ sender: currentUser, message, timestamp: new Date() }); // Display message immediately
-            }
-          });
-        });
-    
-        // function loadContacts() {
-       
-        //   const contacts = [
-        //     { email: 'contact1@example.com', name: 'Contact 1' },
-        //     { email: 'contact2@example.com', name: 'Contact 2' }
-        //   ];
-        //   const contactList = document.querySelector('.contact-list');
-        //   contacts.forEach(contact => {
-        //     const contactElement = document.createElement('div');
-        //     contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
-        //     contactElement.dataset.email = contact.email;
-        //     contactElement.innerHTML = `
-        //       <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
-        //       <div class="flex-grow">
-        //         <div class="font-bold">${contact.name}</div>
-        //       </div>
-        //     `;
-        //     contactElement.addEventListener('click', () => {
-        //       document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
-        //       contactElement.classList.add('selected-contact');
-        //       currentChatUser = contact.email;
-        //       loadChatHistory(currentUser, currentChatUser); // Load chat history when a contact is selected
-        //     });
-        //     contactList.appendChild(contactElement);
-        //   });
-        // }
-
-        async function loadContacts() {
-  try {
-    const currentUser = localStorage.getItem('email'); // Get logged-in user email
+<script type="module">
+  import { db, collection, addDoc, query, where, orderBy, onSnapshot, getDocs } from './firebase.js';
+  
+  let currentUser = localStorage.getItem('email');
+  let currentChatUser = null;
+  const displayedMessages = new Set();
+  let unsubscribeMessages = null;
+  
+  // Function to load contacts
+  async function loadContacts() {
     const contactList = document.querySelector('.contact-list');
     const contacts = new Set();
+    
+    try {
+        const senderQuery = query(collection(db, 'chats'), where('sender', '==', currentUser));
+        const receiverQuery = query(collection(db, 'chats'), where('receiver', '==', currentUser));
 
-    // Fetch messages where the logged-in user is either sender or receiver
-    const senderQuery = query(
-      collection(db, 'chats'),
-      where('sender', '==', currentUser)
-    );
+        const [senderSnapshot, receiverSnapshot] = await Promise.all([
+            getDocs(senderQuery),
+            getDocs(receiverQuery)
+        ]);
 
-    const receiverQuery = query(
-      collection(db, 'chats'),
-      where('receiver', '==', currentUser)
-    );
+        senderSnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.receiver !== currentUser) {
+                contacts.add(data.receiver);
+            }
+        });
 
-    const senderSnapshot = await getDocs(senderQuery);
-    senderSnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.receiver !== currentUser) {
-        contacts.add(data.receiver);
-      }
-    });
+        receiverSnapshot.forEach((doc) => {
+            const data = doc.data();
+            if (data.sender !== currentUser) {
+                contacts.add(data.sender);
+            }
+        });
 
-    const receiverSnapshot = await getDocs(receiverQuery);
-    receiverSnapshot.forEach((doc) => {
-      const data = doc.data();
-      if (data.sender !== currentUser) {
-        contacts.add(data.sender);
-      }
-    });
+        contactList.innerHTML = '';
 
-    // Clear previous contact list
-    contactList.innerHTML = '';
+        // Add group chat if it doesn't already exist
+        if (!contactList.querySelector(`[data-email="Unterhaltung"]`)) {
+            const groupChatElement = document.createElement('div');
+            groupChatElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+            groupChatElement.dataset.email = 'Unterhaltung';
+            groupChatElement.innerHTML = `
+                <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+                <div class="flex-grow">
+                    <div class="font-bold">Unterhaltung</div>
+                </div>
+            `;
+            groupChatElement.addEventListener('click', () => {
+                document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+                groupChatElement.classList.add('selected-contact');
+                currentChatUser = 'Unterhaltung';
+                loadChatHistory(currentUser, currentChatUser);
+                listenForMessages(currentUser, currentChatUser);
+            });
+            contactList.appendChild(groupChatElement);
+        }
 
-    // Display contacts
-    contacts.forEach((email) => {
-      const contactElement = document.createElement('div');
-      contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
-      contactElement.dataset.email = email;
-      contactElement.innerHTML = `
-        <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
-        <div class="flex-grow">
-          <div class="font-bold">${email}</div>
-        </div>
-      `;
-      contactElement.addEventListener('click', () => {
-        document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
-        contactElement.classList.add('selected-contact');
-        currentChatUser = email;
-        loadChatHistory(currentUser, currentChatUser);
-      });
-      contactList.appendChild(contactElement);
-    });
+        contacts.forEach((email) => {
+            if (email !== 'Unterhaltung') { // Avoid adding the group chat again
+                const contactElement = document.createElement('div');
+                contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+                contactElement.dataset.email = email;
+                contactElement.innerHTML = `
+                    <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+                    <div class="flex-grow">
+                        <div class="font-bold">${email}</div>
+                    </div>
+                `;
+                contactElement.addEventListener('click', () => {
+                    document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+                    contactElement.classList.add('selected-contact');
+                    currentChatUser = email;
+                    loadChatHistory(currentUser, currentChatUser);
+                    listenForMessages(currentUser, currentChatUser);
+                });
+                contactList.appendChild(contactElement);
+            }
+        });
 
-  } catch (error) {
-    console.error('Error loading contacts:', error);
-  }
+    } catch (error) {
+        console.error('Error loading contacts:', error);
+    }
 }
-    
-        async function sendMessage(sender, receiver, message) {
-          try {
-            await addDoc(collection(db, 'chats'), {
-              sender,
-              receiver,
-              message,
-              timestamp: new Date()
+  
+  // Function to send a message
+  async function sendMessage(sender, receiver, message, isGroup = false) {
+    try {
+        if (isGroup) {
+            await sendGroupMessage(receiver, sender, message);
+        } else {
+            const docRef = await addDoc(collection(db, 'chats'), {
+                sender,
+                receiver,
+                message,
+                timestamp: new Date(),
+                isGroup
             });
-          } catch (e) {
-            console.error('Error adding document: ', e);
-          }
+            displayMessage({ id: docRef.id, sender, receiver, message, timestamp: new Date(), isGroup });
         }
-    
-        window.loadChatHistory = async function(user1, user2) {
-          const chatSection = document.querySelector('#chatSection .chat');
-          chatSection.innerHTML = ''; // Clear previous chat
-    
-          // Query Firestore to get chat history
-          const q1 = query(
-            collection(db, 'chats'),
-            where('sender', '==', user1),
-            where('receiver', '==', user2),
-            orderBy('timestamp', 'asc')
-          );
-    
-          const q2 = query(
-            collection(db, 'chats'),
-            where('sender', '==', user2),
-            where('receiver', '==', user1),
-            orderBy('timestamp', 'asc')
-          );
-    
-          // Use Promise.all to fetch data from both queries
-          Promise.all([
-            getDocs(q1),
-            getDocs(q2)
-          ]).then(([snapshot1, snapshot2]) => {
-            chatSection.innerHTML = ''; // Clear previous chat
-            snapshot1.forEach((doc) => {
-              const chat = doc.data();
-              displayMessage(chat);
-            });
-            snapshot2.forEach((doc) => {
-              const chat = doc.data();
-              displayMessage(chat);
-            });
-          }).catch((e) => {
-            console.error('Error loading chat history: ', e);
-          });
-        }
+    } catch (e) {
+        console.error('Error adding document: ', e);
+    }
+}
 
-        // real time 
-        // Ensure you add this function to the global window object
-        window.listenForMessages = function(user1, user2) {
-  const chatSection = document.querySelector('#chatSection .chat');
-
-  const q1 = query(
-    collection(db, 'chats'),
-    where('sender', '==', user1),
-    where('receiver', '==', user2),
-    orderBy('timestamp', 'asc')
-  );
-
-  const q2 = query(
-    collection(db, 'chats'),
-    where('sender', '==', user2),
-    where('receiver', '==', user1),
-    orderBy('timestamp', 'asc')
-  );
-
-  onSnapshot(q1, (snapshot) => {
+  
+  // Function to load chat history
+  async function loadChatHistory(user1, user2, isGroup = false) {
+    const chatSection = document.querySelector('#chatSection .chat');
     chatSection.innerHTML = '';
-    snapshot.forEach((doc) => {
-      const chat = doc.data();
-      displayMessage(chat);
-    });
-  });
 
-  onSnapshot(q2, (snapshot) => {
-    snapshot.forEach((doc) => {
-      const chat = doc.data();
-      displayMessage(chat);
-    });
-  });
-};
+    if (isGroup) {
+        // Load group messages
+        const groupId = user2; // Assuming user2 is the group ID
+        const messagesRef = collection(db, 'groupChats', groupId, 'messages');
+        const q = query(messagesRef, orderBy('timestamp', 'asc'));
+        const snapshot = await getDocs(q);
+        const allMessages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        chatSection.innerHTML = '';
+        displayedMessages.clear();
+        allMessages.forEach(chat => displayMessage(chat));
+        chatSection.scrollTop = chatSection.scrollHeight;
+    } else {
+        const q1 = query(collection(db, 'chats'), where('sender', '==', user1), where('receiver', '==', user2), orderBy('timestamp', 'asc'));
+        const q2 = query(collection(db, 'chats'), where('sender', '==', user2), where('receiver', '==', user1), orderBy('timestamp', 'asc'));
 
-        // real time 
-    
-        function displayMessage(chat) {
-          const chatSection = document.querySelector('#chatSection .chat');
-          const messageElement = document.createElement('div');
-          messageElement.classList.add('message', 'mb-4', 'flex', 'items-start');
-          messageElement.innerHTML = `
+        try {
+            const [snapshot1, snapshot2] = await Promise.all([getDocs(q1), getDocs(q2)]);
+            const allMessages = [];
+
+            snapshot1.forEach((doc) => allMessages.push({ id: doc.id, ...doc.data() }));
+            snapshot2.forEach((doc) => allMessages.push({ id: doc.id, ...doc.data() }));
+
+            allMessages.sort((a, b) => a.timestamp - b.timestamp);
+
+            chatSection.innerHTML = '';
+            displayedMessages.clear();
+            allMessages.forEach((chat) => displayMessage(chat));
+
+            chatSection.scrollTop = chatSection.scrollHeight;
+
+        } catch (e) {
+            console.error('Error loading chat history: ', e);
+        }
+    }
+}
+
+  // Function to listen for new messages in real-time
+  function listenForMessages(user1, user2, isGroup = false) {
+    if (unsubscribeMessages) {
+        unsubscribeMessages();
+    }
+
+    displayedMessages.clear();
+
+    if (isGroup) {
+        const groupId = user2; // Assuming user2 is the group ID in this case
+        unsubscribeMessages = loadGroupMessages(groupId);
+    } else {
+        const q1 = query(collection(db, 'chats'), where('sender', '==', user1), where('receiver', '==', user2), orderBy('timestamp', 'asc'));
+        const q2 = query(collection(db, 'chats'), where('sender', '==', user2), where('receiver', '==', user1), orderBy('timestamp', 'asc'));
+
+        const unsubscribe1 = onSnapshot(q1, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const chat = { id: change.doc.id, ...change.doc.data() };
+                    if (!displayedMessages.has(chat.id)) {
+                        displayMessage(chat);
+                        displayedMessages.add(chat.id);
+                    }
+                }
+            });
+        });
+
+        const unsubscribe2 = onSnapshot(q2, (snapshot) => {
+            snapshot.docChanges().forEach((change) => {
+                if (change.type === 'added') {
+                    const chat = { id: change.doc.id, ...change.doc.data() };
+                    if (!displayedMessages.has(chat.id)) {
+                        displayMessage(chat);
+                        displayedMessages.add(chat.id);
+                    }
+                }
+            });
+        });
+
+        unsubscribeMessages = () => {
+            unsubscribe1();
+            unsubscribe2();
+        };
+    }
+}
+
+  
+  // Function to display a message
+  function displayMessage(chat) {
+    const chatSection = document.querySelector('#chatSection .chat');
+    if (!displayedMessages.has(chat.id)) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', 'mb-4', 'flex', 'items-start');
+        messageElement.innerHTML = `
             <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
             <div class="${chat.sender === currentUser ? 'bg-blue-100' : 'bg-gray-100'} p-3 rounded-lg max-w-xs">
-              ${chat.message}
-              <div class="text-sm text-gray-500 mt-1">${new Date(chat.timestamp.toDate ? chat.timestamp.toDate() : chat.timestamp).toLocaleTimeString()}</div>
+                <div class="font-bold">${chat.sender === 'Unterhaltung' ? 'System' : chat.sender}</div>
+                ${chat.message}
+                <div class="text-sm text-gray-500 mt-1">${new Date(chat.timestamp.toDate ? chat.timestamp.toDate() : chat.timestamp).toLocaleString()}</div>
             </div>
+        `;
+        chatSection.appendChild(messageElement);
+        chatSection.scrollTop = chatSection.scrollHeight;
+    }
+}
+
+  
+  // Event listener for sending messages
+  document.querySelector('#sendMessage').addEventListener('click', () => {
+      const messageInput = document.querySelector('#messageInput');
+      const message = messageInput.value.trim();
+      messageInput.value = '';
+  
+      if (currentChatUser && message) {
+          sendMessage(currentUser, currentChatUser, message);
+      }
+  });
+  
+  // Function to handle chat switching
+  function handleChatSelection(email) {
+      const contactList = document.querySelector('.contact-list');
+      let contactElement = contactList.querySelector(`[data-email="${email}"]`);
+  
+      if (!contactElement) {
+          // Create a new contact element if it doesn't exist
+          contactElement = document.createElement('div');
+          contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+          contactElement.dataset.email = email;
+          contactElement.innerHTML = `
+              <img src="https://via.placeholder.com/40" alt="Profile Picture" class="rounded-full mr-3">
+              <div class="flex-grow">
+                  <div class="font-bold">${email} (Temporary)</div>
+              </div>
           `;
-          chatSection.appendChild(messageElement);
-          chatSection.scrollTop = chatSection.scrollHeight; // Scroll to the bottom
-        }
-      </script>
-     
+          contactElement.addEventListener('click', () => {
+              document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+              contactElement.classList.add('selected-contact');
+              currentChatUser = email;
+              loadChatHistory(currentUser, currentChatUser);
+              listenForMessages(currentUser, currentChatUser);
+          });
+          contactList.appendChild(contactElement);
+      } else {
+          // Click the contact to select it
+          contactElement.click();
+      }
+  }
+  
+  // Load contacts on page load
+  loadContacts();
+
+
+  document.addEventListener('DOMContentLoaded', () => {
+  console.log('Script loaded');
+
+  document.body.addEventListener('click', (event) => {
+      if (event.target.matches('.admin-chat-button')) {
+          console.log('Button clicked');
+          const adminEmail = event.target.getAttribute('data-email');
+          console.log('Admin Email:', adminEmail);
+          
+          document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
+          handleChatSelection(adminEmail); // Ensure the correct handling of chat selection
+      }
+  });
+});
+
+
+const handleAdminChat = async (email) => {
+    const contactList = document.querySelector('.contact-list');
+
+    // Check if the group chat already exists
+    let contactElement = contactList.querySelector(`[data-email="${email}"]`);
+
+    if (!contactElement) {
+        // Create a new contact element if it doesn't exist
+        contactElement = document.createElement('div');
+        contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
+        contactElement.dataset.email = email;
+        contactElement.innerHTML = `
+            <img src="https://via.placeholder.com/40" alt="Profile Picture" class="rounded-full mr-3">
+            <div class="flex-grow">
+                <div class="font-bold">${email}</div>
+            </div>
+        `;
+        contactElement.addEventListener('click', () => {
+            document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+            contactElement.classList.add('selected-contact');
+            currentChatUser = email;
+            loadChatHistory(currentUser, currentChatUser, email === 'Unterhaltung');
+            listenForMessages(currentUser, currentChatUser, email === 'Unterhaltung');
+        });
+        contactList.appendChild(contactElement);
+    } else {
+        // Contact exists, click it to select
+        contactElement.click();
+        return; // Exit to avoid additional operations
+    }
+
+    // Ensure scrolling to the chat section
+    document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
+};
+
+
+// Event listener for admin chat button clicks
+document.body.addEventListener('click', (event) => {
+    if (event.target.matches('.admin-chat-button')) {
+        const adminEmail = event.target.getAttribute('data-email');
+        
+        // Handle chat selection
+        handleAdminChat(adminEmail);
+        
+        // Ensure scrolling to the chat section
+        document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
+    }
+});
+
+const createOrUpdateGroupChat = async (groupId, members) => {
+    try {
+        const groupChatRef = doc(db, 'groupChats', groupId);
+        await setDoc(groupChatRef, {
+            name: 'Unterhaltung', // Group chat name
+            members: members // Array of member emails
+        });
+    } catch (error) {
+        console.error('Error creating/updating group chat:', error);
+    }
+};
+const sendGroupMessage = async (groupId, sender, text) => {
+    try {
+        const messagesRef = collection(db, 'groupChats', groupId, 'messages');
+        await addDoc(messagesRef, {
+            sender: sender,
+            text: text,
+            timestamp: new Date()
+        });
+    } catch (error) {
+        console.error('Error sending group message:', error);
+    }
+};
+
+const loadGroupMessages = (groupId) => {
+    const messagesRef = collection(db, 'groupChats', groupId, 'messages');
+    const q = query(messagesRef, orderBy('timestamp'));
+
+    const unsubscribe = onSnapshot(q, (snapshot) => {
+        const messages = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+        displayMessages(messages);
+    });
+
+    return unsubscribe;
+};
+
+const displayMessages = (messages) => {
+    const chatSection = document.querySelector('#chatSection .chat');
+    chatSection.innerHTML = '';
+
+    messages.forEach((message) => {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', 'mb-4', 'flex', 'items-start');
+        messageElement.innerHTML = `
+            <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
+            <div class="${message.sender === currentUser ? 'bg-blue-100' : 'bg-gray-100'} p-3 rounded-lg max-w-xs">
+                <div class="font-bold">${message.sender === 'Unterhaltung' ? 'System' : message.sender}</div>
+                ${message.text}
+                <div class="text-sm text-gray-500 mt-1">${new Date(message.timestamp.toDate ? message.timestamp.toDate() : message.timestamp).toLocaleString()}</div>
+            </div>
+        `;
+        chatSection.appendChild(messageElement);
+    });
+
+    chatSection.scrollTop = chatSection.scrollHeight; // Scroll to the bottom
+};
+
+
+document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
+groupChatElement.classList.add('selected-contact');
+currentChatUser = 'Unterhaltung'; // Or the group chat ID
+loadGroupMessages('your-group-chat-id'); // Adjust based on your group chat structure
+
+
+
+  </script>
     
 
 </body>

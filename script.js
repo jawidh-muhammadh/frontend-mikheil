@@ -397,73 +397,57 @@ const registerForEvent = async (eventData) => {
 
 // SEARCH AN EVENT 
 document.getElementById('searchButton').addEventListener('click', async () => {
-  // const searchInput = document.getElementById('searchInput').value.trim();
   const searchInputLg = document.getElementById('searchInputLg').value.trim();
   const searchInputSm = document.getElementById('searchInputSm').value.trim();
 
-  const searchInput = window.innerWidth >= 1024 ? searchInputLg : searchInputSm; // Assuming lg breakpoint is 1024px
+  const searchInput = window.innerWidth >= 1024 ? searchInputLg : searchInputSm;
 
   if (!searchInput) {
-      console.error('Search input is empty');
-      return;
+    console.error('Search input is empty');
+    return;
   }
-
-
-  console.log(searchInput);
 
   const encodedQuery = encodeURIComponent(searchInput);
-  console.log('Encoded Query:', encodedQuery); // Log the encoded query
 
   try {
-      const response = await fetch(`http://localhost:5000/api/events/search/${encodedQuery}`);
-      if (!response.ok) {
-          throw new Error('Network response was not ok');
-      }
+    const response = await fetch(`http://localhost:5000/api/events/search/${encodedQuery}`);
+    if (!response.ok) {
+      throw new Error('Network response was not ok');
+    }
 
-      const data = await response.json();
-      console.log('Search Results:', data);
+    const data = await response.json();
+    console.log('Search Results:', data);
 
-      // Ensure data.events is defined and is an array
-      const events = Array.isArray(data) ? data : [];
-      const resultsContainer = document.getElementById('searchResults');
+    // Access the events array correctly
+    const events = Array.isArray(data.events) ? data.events : [];
+    const resultsContainer = document.getElementById('searchResults');
 
- 
-
-      if (events.length > 0) {
-        // container visible if theree are search results
-        resultsContainer.classList.remove('hidden');
-        resultsContainer.innerHTML = events.map(event => `
-          <div class="border p-4 rounded-lg shadow-lg">
-             
-      
-           <div class=" w-full h-24"> 
-          <img  class="  w-full h-24 flex object-cover  mb-4 rounded-lg" src="${BASE_URL}${event.image}" alt="${event.eventName}" />
-        </div>
-            <h3 class="text-xl font-semibold mb-2">${event.eventName}</h3>
-            <p class="text-gray-600 mb-1">${new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
-            <p class="text-gray-600 mb-1">${event.time}</p>
-            <p class="text-gray-600">${event.location}</p>
-
-               <div class="w-full mt-3">
-                            <button   
-                             data-event-name="${event.eventName}"
-        data-event-id="${event._id}"
-                            class=" register-button bg-[#0043E2] text-white break-all font-poppins py-2 px-4 text-xs  rounded-md lg:w-fit w-full  "> Register </button>
-
-                        </div>
-
+    if (events.length > 0) {
+      // Show the container and update the HTML
+      resultsContainer.classList.remove('hidden');
+      resultsContainer.innerHTML = events.map(event => `
+        <div class="border p-4 rounded-lg shadow-lg">
+          <div class="w-full h-24"> 
+            <img class="w-full h-24 flex object-cover mb-4 rounded-lg" src="${BASE_URL}${event.image}" alt="${event.eventName}" />
           </div>
-        `).join('');
-      } else {
-        // hide container if no result
-        resultsContainer.classList.add('hidden');
-      }
-
-  
+          <h3 class="text-xl font-semibold mb-2">${event.eventName}</h3>
+          <p class="text-gray-600 mb-1">${new Date(event.date).toLocaleDateString('en-US', { year: 'numeric', month: 'long', day: 'numeric' })}</p>
+          <p class="text-gray-600 mb-1">${event.time}</p>
+          <p class="text-gray-600">${event.location}</p>
+          <div class="w-full mt-3">
+            <button data-event-name="${event.eventName}" data-event-id="${event._id}" class="register-button bg-[#0043E2] text-white break-all font-poppins py-2 px-4 text-xs rounded-md lg:w-fit w-full">Register</button>
+          </div>
+        </div>
+      `).join('');
+    } else {
+      // Hide the container if no results
+      resultsContainer.classList.add('hidden');
+    }
   } catch (error) {
-      console.error('Error fetching events:', error);
+    console.error('Error fetching events:', error);
   }
 });
+
 
 
 
@@ -815,6 +799,63 @@ document.addEventListener('DOMContentLoaded', () => {
       console.error('Error:', error);
     }
   });
+
+  // signupForm.addEventListener('submit', async (e) => {
+  //   e.preventDefault();
+  //   const name = document.getElementById('signupName').value.trim();
+  //   const email = document.getElementById('signupEmail').value.trim();
+  //   const password = document.getElementById('signupPassword').value.trim();
+  
+  //   // Clear previous errors
+  //   document.getElementById('signupNameError').textContent = '';
+  //   document.getElementById('signupEmailError').textContent = '';
+  //   document.getElementById('signupPasswordError').textContent = '';
+  
+  //   if (!name || !email || !password) {
+  //     if (!name) document.getElementById('signupNameError').textContent = 'Name is required';
+  //     if (!email) document.getElementById('signupEmailError').textContent = 'Email is required';
+  //     if (!password) document.getElementById('signupPasswordError').textContent = 'Password is required';
+  //     return;
+  //   }
+  
+  //   try {
+  //     const response = await fetch('http://localhost:5000/api/auth/register', {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify({ name, email, password }),
+  //     });
+  
+  //     const data = await response.json();
+  
+  //     if (response.ok) {
+  //       // Show verification modal
+  //       localStorage.setItem('email', email);
+  //       document.getElementById('verificationModal').classList.remove('hidden');
+        
+  //       // Hide signup modal and reset fields
+  //       signupModal.classList.add('hidden');
+  //       document.getElementById('signupName').value = '';
+  //       document.getElementById('signupEmail').value = '';
+  //       document.getElementById('signupPassword').value = '';
+  
+  //       // Update UI state
+  //       document.getElementById('loginSignupButtons').classList.add('hidden');
+  //       document.getElementById('logoutButton').classList.remove('hidden');
+  //     } else {
+  //       alert(`Error: ${data.message}`);
+  //     }
+  //   } catch (error) {
+  //     console.error('Error:', error);
+  //   }
+  // });
+  
+});
+
+
+document.getElementById('closeVerification').addEventListener('click', () => {
+  document.getElementById('verificationModal').classList.add('hidden');
 });
 
 
@@ -868,7 +909,120 @@ document.addEventListener('DOMContentLoaded', function() {
 
 
 // personal information section logics 
-document.addEventListener("DOMContentLoaded", () => {
+// document.addEventListener("DOMContentLoaded", () => {
+//   const editButton = document.getElementById("edit-button");
+//   const saveButton = document.getElementById("save-button");
+//   const profileImage = document.getElementById("profile-image");
+//   const imageUpload = document.getElementById("image-upload");
+
+//   const nameDisplay = document.getElementById("name-display");
+//   const lastNameDisplay = document.getElementById("last-name-display");
+//   const dobDisplay = document.getElementById("dob-display");
+//   const phoneDisplay = document.getElementById("phone-display");
+
+//   const nameInput = document.getElementById("name-input");
+//   const lastNameInput = document.getElementById("last-name-input");
+//   const dobInput = document.getElementById("dob-input");
+//   const phoneInput = document.getElementById("phone-input");
+
+//   const verificationMessage = document.getElementById("verification-message");
+
+//   const email = localStorage.getItem("email");
+
+//   const fetchUserData = async () => {
+//     try {
+//       const response = await fetch(`http://localhost:5000/api/auth/user/${email}`);
+//       const data = await response.json();
+//       nameDisplay.textContent = data.name || "Not Set";
+//       lastNameDisplay.textContent = data.last_name || "Not Set";
+//       dobDisplay.textContent = data.date_of_birth ? new Date(data.date_of_birth).toLocaleDateString() : "Not Set";
+//       phoneDisplay.textContent = data.phone_number || "Not Set";
+
+//       const profileImageElement = document.getElementById("profile-image");
+// if (data.profile_image) {
+//   profileImageElement.src = `http://localhost:5000${data.profile_image}`
+// } else {
+//   profileImageElement.src = "https://via.placeholder.com/200";
+// }
+
+//       nameInput.value = data.name || "";
+//       lastNameInput.value = data.last_name || "";
+//       dobInput.value = data.date_of_birth ? new Date(data.date_of_birth).toISOString().split('T')[0] : "";
+//       phoneInput.value = data.phone_number || "";
+//     } catch (error) {
+//       alert("Failed to fetch user data");
+//     }
+//   };
+
+//   const toggleEditMode = () => {
+//     const isEditMode = nameInput.classList.contains("hidden");
+
+//     if (isEditMode) {
+//       nameInput.classList.remove("hidden");
+//       lastNameInput.classList.remove("hidden");
+//       dobInput.classList.remove("hidden");
+//       phoneInput.classList.remove("hidden");
+
+//       nameDisplay.classList.add("hidden");
+//       lastNameDisplay.classList.add("hidden");
+//       dobDisplay.classList.add("hidden");
+//       phoneDisplay.classList.add("hidden");
+
+//       editButton.classList.add("hidden");
+//       saveButton.classList.remove("hidden");
+//       imageUpload.classList.remove("hidden");
+//     } else {
+//       nameInput.classList.add("hidden");
+//       lastNameInput.classList.add("hidden");
+//       dobInput.classList.add("hidden");
+//       phoneInput.classList.add("hidden");
+
+//       nameDisplay.classList.remove("hidden");
+//       lastNameDisplay.classList.remove("hidden");
+//       dobDisplay.classList.remove("hidden");
+//       phoneDisplay.classList.remove("hidden");
+
+//       editButton.classList.remove("hidden");
+//       saveButton.classList.add("hidden");
+//       imageUpload.classList.add("hidden");
+//     }
+//   };
+
+//   const saveUserData = async () => {
+//     const formData = new FormData();
+//     formData.append("name", nameInput.value);
+//     formData.append("last_name", lastNameInput.value);
+//     formData.append("date_of_birth", dobInput.value);
+//     formData.append("phone_number", phoneInput.value);
+//     if (imageUpload.files.length > 0) {
+//       formData.append("profile_image", imageUpload.files[0]);
+//     }
+
+//     try {
+//       const response = await fetch(`http://localhost:5000/api/auth/user/${email}`, {
+//         method: "PUT",
+//         body: formData,
+//       });
+//       if (response.ok) {
+//         alert("Profile updated successfully");
+//         fetchUserData();
+//         toggleEditMode();
+//       } else {
+//         alert("Failed to update profile");
+//       }
+//     } catch (error) {
+//       alert("Failed to update profile");
+//     }
+//   };
+
+//   editButton.addEventListener("click", toggleEditMode);
+//   saveButton.addEventListener("click", saveUserData);
+
+//   fetchUserData();
+// });
+
+
+document.addEventListener("DOMContentLoaded", async () => {
   const editButton = document.getElementById("edit-button");
   const saveButton = document.getElementById("save-button");
   const profileImage = document.getElementById("profile-image");
@@ -884,6 +1038,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const dobInput = document.getElementById("dob-input");
   const phoneInput = document.getElementById("phone-input");
 
+  const verificationMessage = document.getElementById("verification-message");
+
   const email = localStorage.getItem("email");
 
   const fetchUserData = async () => {
@@ -895,17 +1051,28 @@ document.addEventListener("DOMContentLoaded", () => {
       dobDisplay.textContent = data.date_of_birth ? new Date(data.date_of_birth).toLocaleDateString() : "Not Set";
       phoneDisplay.textContent = data.phone_number || "Not Set";
 
-      const profileImageElement = document.getElementById("profile-image");
-if (data.profile_image) {
-  profileImageElement.src = `http://localhost:5000${data.profile_image}`
-} else {
-  profileImageElement.src = "https://via.placeholder.com/200";
-}
+      if (data.profile_image) {
+        profileImage.src = `http://localhost:5000${data.profile_image}`;
+      } else {
+        profileImage.src = "https://via.placeholder.com/200";
+      }
 
       nameInput.value = data.name || "";
       lastNameInput.value = data.last_name || "";
       dobInput.value = data.date_of_birth ? new Date(data.date_of_birth).toISOString().split('T')[0] : "";
       phoneInput.value = data.phone_number || "";
+
+      // Display email verification status
+      if (data.isVerified) {
+        verificationMessage.textContent = "Your email has been verified.";
+        verificationMessage.classList.remove("text-red-500");
+        verificationMessage.classList.add("text-green-500");
+      } else {
+        verificationMessage.textContent = "Your email has not been verified.";
+        verificationMessage.classList.remove("text-green-500");
+        verificationMessage.classList.add("text-red-500");
+      }
+
     } catch (error) {
       alert("Failed to fetch user data");
     }
@@ -978,222 +1145,6 @@ if (data.profile_image) {
   fetchUserData();
 });
 
-// personal information section logics ends
-
-
-
-
-
-
-
-// socket connection messages 
-// let socket;
-//   let currentUser = 'jawidhmuhammadh@gmail.com'; // Replace with authenticated user email
-//   let currentChatUser = 'president@gmail.com';
-
-//   document.addEventListener('DOMContentLoaded', () => {
-//     // socket = io();
-//     socket = io('http://localhost:5000'); 
-//     console.log('Socket initialized'); // Log when socket is initialized
-
-//     socket.on('connect', () => {
-//       console.log('Connected to socket server'); // Log when connected to socket server
-//     });
-
-//     socket.on('receiveMessage', (chat) => {
-//       console.log('Message received:', chat); // Log the received message
-//       if ((chat.sender === currentUser && chat.receiver === currentChatUser) || 
-//           (chat.sender === currentChatUser && chat.receiver === currentUser)) {
-//         displayMessage(chat);
-//       }
-//     });
-
-//     document.querySelector('.contact').addEventListener('click', (event) => {
-//       currentChatUser = event.currentTarget.dataset.email;
-//       fetchChatHistory(currentUser, currentChatUser);
-//     });
-
-//     document.querySelector('#sendMessage').addEventListener('click', () => {
-//       console.log("hi");
-//       const messageInput = document.querySelector('#messageInput');
-//       const message = messageInput.value;
-//       messageInput.value = '';
-//       const chat = { sender: currentUser, receiver: currentChatUser, message };
-//       console.log('Sending message:', chat); // Log the message before sending
-//       socket.emit('sendMessage', chat);
-//       displayMessage(chat);
-//     });
-//   });
-
-//   function fetchChatHistory(user1, user2) {
-//     fetch(`http://localhost:5000/api/chats/chats?user1=${user1}&user2=${user2}`)
-//       .then(response => response.json())
-//       .then(chats => {
-//         console.log('Fetched chat history:', chats); // Log fetched chats
-//         const chatSection = document.querySelector('#chatSection .chat');
-//         chatSection.innerHTML = '';
-//         chats.forEach(displayMessage);
-//       })
-//       .catch(error => {
-//         console.error('Error fetching chat history:', error);
-//       });
-//   }
-
-//   function displayMessage(chat) {
-//     const chatSection = document.querySelector('#chatSection .chat');
-//     const messageElement = document.createElement('div');
-//     messageElement.classList.add('message', 'mb-4', 'flex', 'items-start');
-//     messageElement.innerHTML = `
-//       <img src="https://via.placeholder.com/40" class="rounded-full mr-3">
-//       <div class="${chat.sender === currentUser ? 'bg-blue-100' : 'bg-gray-100'} p-3 rounded-lg max-w-xs">
-//         ${chat.message}
-//         <div class="text-sm text-gray-500 mt-1">${new Date(chat.timestamp).toLocaleTimeString()}</div>
-//       </div>
-//     `;
-//     console.log('Appending message element:', messageElement); // Log the message element before appending
-//     chatSection.appendChild(messageElement);
-//   }
-// socket connection messages 
-
-
-
-
-// document.addEventListener('DOMContentLoaded', () => {
-//   console.log('Script loaded');
-  
-//   document.body.addEventListener('click', (event) => {
-//     if (event.target.matches('.admin-chat-button')) {
-//       console.log('Button clicked');
-//       const adminEmail = event.target.getAttribute('data-email');
-//       console.log('Admin Email:', adminEmail);
-      
-//       document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
-//       addAdminEmailToContactList(adminEmail);
-//     }
-//   });
-// });
-
-
-// // Function to add admin email to the contact list
-// const addAdminEmailToContactList = (email) => {
-//   const contactList = document.getElementById('contactList');
-
-//   // Check if the email is already in the list
-//   if (!contactList.querySelector(`[data-email="${email}"]`)) {
-//     const contactElement = document.createElement('div');
-//     contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
-//     contactElement.setAttribute('data-email', email);
-
-//     // Use a placeholder or a local image for the contact
-//     contactElement.innerHTML = `
-//       <img src="https://via.placeholder.com/40" alt="Profile Picture" class="rounded-full mr-3">
-//       <div class="flex-grow">
-//         <div class="font-bold">${email}</div>
-//       </div>
-//     `;
-
-//     // Add event listener to the new contact
-//     contactElement.addEventListener('click', () => {
-//       // Remove the selected class from all contacts
-//       document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
-
-//       // Add the selected class to the clicked contact
-//       contactElement.classList.add('selected-contact');
-      
-//       // Set current chat user and load chat history
-//       currentChatUser = email;
-//       loadChatHistory(currentUser, currentChatUser);
-//     });
-
-//     // Append the new contact element to the contact list
-//     contactList.appendChild(contactElement);
-//   }
-// };
-
-
-document.addEventListener('DOMContentLoaded', () => {
-  console.log('Script loaded');
-  
-  document.body.addEventListener('click', (event) => {
-    if (event.target.matches('.admin-chat-button')) {
-      console.log('Button clicked');
-      const adminEmail = event.target.getAttribute('data-email');
-      console.log('Admin Email:', adminEmail);
-      
-      document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
-      addAdminEmailToContactList(adminEmail);
-    }
-  });
-});
-
-// Function to add admin email to the contact list
-// const addAdminEmailToContactList = (email) => {
-//   const contactList = document.getElementById('contactList');
-
-//   // Check if the email is already in the list
-//   if (!contactList.querySelector(`[data-email="${email}"]`)) {
-//     const contactElement = document.createElement('div');
-//     contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
-//     contactElement.setAttribute('data-email', email);
-
-//     // Use a placeholder or a local image for the contact
-//     contactElement.innerHTML = `
-//       <img src="https://via.placeholder.com/40" alt="Profile Picture" class="rounded-full mr-3">
-//       <div class="flex-grow">
-//         <div class="font-bold">${email}</div>
-//       </div>
-//     `;
-
-//     // Add event listener to load chat history on click
-//     contactElement.addEventListener('click', () => {
-//       document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
-//       contactElement.classList.add('selected-contact');
-//       const currentUser = localStorage.getItem('email'); // Get the current user from local storage
-//       window.loadChatHistory(currentUser, email); // Load chat history with the selected contact
-//     });
-
-//     contactList.appendChild(contactElement);
-//   }
-// };
-
-
-const addAdminEmailToContactList = async(email) => {
-  const contactList = document.getElementById('contactList');
-
-  if (!contactList.querySelector(`[data-email="${email}"]`)) {
-    const contactElement = document.createElement('div');
-    contactElement.classList.add('contact', 'p-2', 'flex', 'items-center', 'border-b', 'border-gray-200', 'cursor-pointer');
-    contactElement.setAttribute('data-email', email);
-
-    contactElement.innerHTML = `
-      <img src="https://via.placeholder.com/40" alt="Profile Picture" class="rounded-full mr-3">
-      <div class="flex-grow">
-        <div class="font-bold">${email}</div>
-      </div>
-    `;
-
-    // Attach click event listener
-    contactElement.addEventListener('click', () => {
-      document.querySelectorAll('.contact').forEach(el => el.classList.remove('selected-contact'));
-      contactElement.classList.add('selected-contact');
-
-      // Set currentChatUser to the email of the clicked contact
-      window.currentChatUser = email;
-
-
-     const currentUser = localStorage.getItem('email');
-      
-      console.log('Current chat user set to:', window.currentChatUser); // Debugging log
-       loadChatHistory(currentUser, window.currentChatUser);
-       if (typeof listenForMessages === 'function') {
-        listenForMessages(currentUser, window.currentChatUser);
-      }
-
-    });
-
-    contactList.appendChild(contactElement);
-  }
-};
 
 
 
@@ -1255,3 +1206,113 @@ document.addEventListener('DOMContentLoaded', () => {
 
 
 // download the pdf 
+
+
+// change password 
+document.addEventListener('DOMContentLoaded', () => {
+  // Change Password Logic
+  const changePasswordButton = document.getElementById('change-password-button');
+  const oldPasswordInput = document.getElementById('old-password');
+  const newPasswordInput = document.getElementById('new-password');
+  const confirmPasswordInput = document.getElementById('confirm-password');
+  const passwordChangeError = document.getElementById('password-change-error');
+  const passwordChangeSuccess = document.getElementById('password-change-success');
+
+  changePasswordButton.addEventListener('click', async () => {
+    const oldPassword = oldPasswordInput.value.trim();
+    const newPassword = newPasswordInput.value.trim();
+    const confirmPassword = confirmPasswordInput.value.trim();
+
+    // Clear previous messages
+    passwordChangeError.classList.add('hidden');
+    passwordChangeSuccess.classList.add('hidden');
+
+    if (!oldPassword || !newPassword || !confirmPassword) {
+      passwordChangeError.textContent = 'All fields are required';
+      passwordChangeError.classList.remove('hidden');
+      return;
+    }
+
+    if (newPassword !== confirmPassword) {
+      passwordChangeError.textContent = 'New password and confirm password do not match';
+      passwordChangeError.classList.remove('hidden');
+      return;
+    }
+
+    try {
+      const email = localStorage.getItem('email');
+      console.log(email);
+      const response = await fetch(`http://localhost:5000/api/auth/change-password`, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, oldPassword, newPassword }),
+      });
+
+      const data = await response.json();
+
+      if (response.ok) {
+        passwordChangeSuccess.textContent = 'Password changed successfully';
+        passwordChangeSuccess.classList.remove('hidden');
+        oldPasswordInput.value = '';
+        newPasswordInput.value = '';
+        confirmPasswordInput.value = '';
+      } else {
+        passwordChangeError.textContent = `Error: ${data.message}`;
+        passwordChangeError.classList.remove('hidden');
+      }
+    } catch (error) {
+      passwordChangeError.textContent = 'An error occurred while changing the password';
+      passwordChangeError.classList.remove('hidden');
+      console.error('Error:', error);
+    }
+  });
+});
+
+// change password 
+
+
+// verified popup 
+// document.addEventListener('DOMContentLoaded', () => {
+//   const urlParams = new URLSearchParams(window.location.search);
+//   const emailVerified = urlParams.get('emailVerified');
+
+//   // Check if popup has already been shown
+//   const popupShown = localStorage.getItem('popupShown');
+
+//   if (emailVerified === 'true' && !popupShown) {
+//     // Show the popup if emailVerified parameter is true and popup hasn't been shown
+//     showPopup('Email verified successfully!');
+//     // Mark popup as shown in localStorage
+//     localStorage.setItem('popupShown', 'true');
+//   }
+// });
+
+// function showPopup(message) {
+//   const popup = document.getElementById('popupq');
+//   const popupMessage = document.getElementById('popup-message');
+//   const popupClose = document.getElementById('popup-close');
+
+//   // Ensure previous event listeners are removed
+//   popupClose.removeEventListener('click', closePopup);
+
+//   popupMessage.textContent = message;
+//   popup.classList.remove('hidden');
+
+//   popupClose.addEventListener('click', closePopup);
+
+//   // Hide popup after 2 seconds
+//   setTimeout(() => {
+//     popup.classList.add('hidden');
+//   }, 2000);
+// }
+
+// function closePopup() {
+//   const popup = document.getElementById('popupq');
+//   popup.classList.add('hidden');
+// }
+// popupClose.removeEventListener('click', closePopup);
+// popupClose.addEventListener('click', closePopup);
+
+// verified popup 
