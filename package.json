@@ -4,7 +4,7 @@
   "main": "index.js",
   "scripts": {
    
-    "build:css": "tailwindcss -i ./styles.css -o ./output.css --watch",
+    "build:css": "tailwindcss -i ./styles.css -o ./output.css ",
      "serve": "live-server",
   "start": "concurrently \"npm run build:css\" \"npm run serve\""
   },
