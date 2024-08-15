@@ -84,65 +84,75 @@ const createHtmlStructures = () => `
     const eventLocation = document.getElementById('eventLocation').value;
     const eventImage = document.getElementById('eventImage').files[0];
     const errorMessage = document.getElementById('errorMessage');
-  
+
     // Clear previous messages
     errorMessage.textContent = '';
     errorMessage.classList.add('hidden');
-    errorMessage.classList.remove('text-red-500', 'text-green-500'); // Ensure previous classes are removed
-  
+    errorMessage.classList.remove('text-red-500', 'text-green-500');
+
+    // Validation
     if (!eventName || !eventDate || !eventTime || !eventLocation || !eventImage) {
-      errorMessage.textContent = 'All fields are required.';
-      errorMessage.classList.remove('hidden');
-      errorMessage.classList.add('text-red-500');
-      return;
+        errorMessage.textContent = 'All fields are required.';
+        errorMessage.classList.remove('hidden');
+        errorMessage.classList.add('text-red-500');
+        return;
+    }
+
+    // Validate that the date is not in the past and starts from the current year
+    const currentDate = new Date();
+    const selectedDate = new Date(eventDate);
+    if (selectedDate.getFullYear() < currentDate.getFullYear() || selectedDate < currentDate) {
+        errorMessage.textContent = 'Please select a valid date that is not in the past.';
+        errorMessage.classList.remove('hidden');
+        errorMessage.classList.add('text-red-500');
+        return;
     }
 
     const token = localStorage.getItem('email');
-  
+
     const formData = new FormData();
     formData.append('eventName', eventName);
     formData.append('date', eventDate);
     formData.append('time', eventTime);
     formData.append('location', eventLocation);
     formData.append('eventImage', eventImage);
-    formData.append('admin' , token)
-  
+    formData.append('admin', token);
+
     try {
-      const response = await fetch('http://localhost:5000/api/events', {
-        method: 'POST',
-        body: formData
-      });
-  
-      if (response.ok) {
-        // Show success message
-        errorMessage.textContent = 'Event created successfully!';
-        errorMessage.classList.remove('hidden');
-        errorMessage.classList.add('text-green-500');
-  
-        // Reset form fields
-        document.getElementById('eventName').value = '';
-        document.getElementById('eventDate').value = '';
-        document.getElementById('eventTime').value = '';
-        document.getElementById('eventLocation').value = '';
-        document.getElementById('eventImage').value = '';
-  
-        // Hide success message after 10 seconds
-        setTimeout(() => {
-          errorMessage.classList.add('hidden');
-        }, 10000);
-      } else {
-        const errorData = await response.json();
-        errorMessage.textContent = errorData.error || 'Failed to create event.';
+        const response = await fetch('http://localhost:5000/api/events', {
+            method: 'POST',
+            body: formData
+        });
+
+        if (response.ok) {
+            // Show success message
+            errorMessage.textContent = 'Event created successfully!';
+            errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('text-green-500');
+
+            // Reset form fields
+            document.getElementById('eventName').value = '';
+            document.getElementById('eventDate').value = '';
+            document.getElementById('eventTime').value = '';
+            document.getElementById('eventLocation').value = '';
+            document.getElementById('eventImage').value = '';
+
+            // Hide success message after 10 seconds
+            setTimeout(() => {
+                errorMessage.classList.add('hidden');
+            }, 10000);
+        } else {
+            const errorData = await response.json();
+            errorMessage.textContent = errorData.error || 'Failed to create event.';
+            errorMessage.classList.remove('hidden');
+            errorMessage.classList.add('text-red-500');
+        }
+    } catch (error) {
+        errorMessage.textContent = 'An error occurred. Please try again.';
         errorMessage.classList.remove('hidden');
         errorMessage.classList.add('text-red-500');
-      }
-    } catch (error) {
-      errorMessage.textContent = 'An error occurred. Please try again.';
-      errorMessage.classList.remove('hidden');
-      errorMessage.classList.add('text-red-500');
     }
-  });
-  
+});
   
   // create an event functionality ENDS
 
@@ -309,7 +319,7 @@ document.addEventListener('DOMContentLoaded', async () => {
     const { day, month } = formatDate(registration.date); // Assuming `date` field exists in registration
   
     return `
-      <div class="relative w-full h-[280px]">
+      <div class="relative w-full h-[280px]" data-date="${registration.date}">
         <img class="w-full h-full absolute object-cover" src="${BASE_URL}${registration.image}" alt="${registration.eventName}">
         <div class="absolute z-10 flex px-2 top-3 w-full"> 
           <div class="flex justify-between items-center w-full">
@@ -1158,22 +1168,25 @@ document.addEventListener('DOMContentLoaded', () => {
   console.log('jsPDF:', jsPDF); 
 
   // Function to generate and download PDF
-  function generatePDF(eventName, location, time, adminEmail) {
+  function generatePDF(eventName, location, time, adminEmail , fullDate) {
     const userEmail = localStorage.getItem('email'); // Assuming the email is stored under 'email'
     
     console.log('Generating PDF with:', { eventName, location, time, adminEmail, userEmail });
 
     const doc = new jsPDF();
+
+    const formattedDate = new Date(fullDate).toLocaleDateString();
     
     doc.setFontSize(16);
     doc.text('Event Registration Details', 10, 10);
     
     doc.setFontSize(12);
-    doc.text(`Event Name: ${eventName}`, 10, 20);
-    doc.text(`Location: ${location}`, 10, 30);
-    doc.text(`Time: ${time}`, 10, 40);
-    doc.text(`Admin Email: ${adminEmail}`, 10, 50);
-    doc.text(`User Email: ${userEmail}`, 10, 60);
+    doc.text(`Date: ${formattedDate}`, 10, 20);
+    doc.text(`Event Name: ${eventName}`, 10, 30);
+    doc.text(`Location: ${location}`, 10, 40);
+    doc.text(`Time: ${time}`, 10, 50);
+    doc.text(`Admin Email: ${adminEmail}`, 10, 60);
+    doc.text(`User Email: ${userEmail}`, 10, 70);
     
     doc.save('registration-details.pdf');
   }
@@ -1193,10 +1206,10 @@ document.addEventListener('DOMContentLoaded', () => {
         const adminChatButton = registrationElement.querySelector('.admin-chat-button');
         const adminEmail = adminChatButton ? adminChatButton.getAttribute('data-email') : '';
       
-      
+        const fullDate = registrationElement.getAttribute('data-date');
      
 
-        generatePDF(eventName, location, time, adminEmail);
+        generatePDF(eventName, location, time, adminEmail , fullDate);
       } else {
         console.error('Registration element not found');
       }
@@ -1316,3 +1329,7 @@ document.addEventListener('DOMContentLoaded', () => {
 // popupClose.addEventListener('click', closePopup);
 
 // verified popup 
+
+
+
+

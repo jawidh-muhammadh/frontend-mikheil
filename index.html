@@ -274,67 +274,41 @@
        </div>
 
        
-       <!-- events section  ends -->
+       <!-- events section  ends --> 
 
 <!-- create event  -->
 
-       <div class="  authenticated-content mt-16 pb-10 flex flex-col items-center">
+<div class="authenticated-content mt-16 pb-10 flex flex-col items-center">
+  <h1 class="text-3xl font-semibold text-center">Create an Event or Edit an Event</h1>
+  <p class="mt-4 text-lg max-w-lg text-center">Lorem ipsum dolor sit amet consectetur. Habitant ut et varius nunc id. Duis tristique nunc morbi ultrices egestas.</p>
+  
+  <div class="flex lg:flex-row flex-col lg:p-0 p-2 mt-8 gap-4">
+      <img class="w-full lg:w-6/12 h-full" src="/images/Left.png" alt="Event Image">
 
-        <h1 class=" font-poppins text-3xl font-semibold text-center"> Create an event or edit an Event</h1>
-
-      <p class=" mt-4 font-poppins text-lg max-w-lg text-center">Lorem ipsum dolor sit amet consectetur. Habitant ut et varius nunc id. Duis tristique nunc morbi ultrices egestas  </p>
-
-      <!-- <button  class="bg-blue-500 text-white px-4 py-2 mt-5"></button> -->
-      
-      <div class=" flex lg:flex-row flex-col  lg:p-0 p-2 mt-8 gap-4"> 
-        
-        <img class="  w-full lg:w-6/12 h-full" src="/images/Left.png">
-
-        <div class=" border p-2 flex flex-col gap-3 h-fit w-full rounded-md">
+      <div class="border p-4 flex flex-col gap-4 h-fit w-full rounded-md">
+          <input id="eventName" placeholder="Event Name" class="w-full border p-2 outline-none">
           
-          <!-- <input placeholder="Event Name" class=" w-full border p-2 outline-none">
-            <input placeholder="Date" class=" w-full border p-2 outline-none">
-
-            <input placeholder="Time" class=" w-full border p-2 outline-none">
-            <input placeholder="Location" class=" w-full border p-2 outline-none">
-            <input type="file" > -->
-            <!-- <textarea class=" w-full border  p-2 h-24" placeholder="Description"></textarea> -->
-          
-
-            <input id="eventName" placeholder="Event Name" class="w-full border p-2 outline-none">
-           <div class=" flex flex-col gap-1 "> 
-
-       <label class=" text-slate-400 font-poppins text-sm"> Date </label>
-            <input id="eventDate" type="date" placeholder="Date" class="w-full border p-2 outline-none">
+          <div class="flex flex-col gap-1">
+              <label class="text-slate-400 font-poppins text-sm">Date</label>
+              <input id="eventDate" type="date" placeholder="Date" class="w-full border p-2 outline-none">
           </div>
           
-          <div class=" flex flex-col gap-1 "> 
-
-           
-            <label class=" text-slate-400 font-poppins text-sm" > Time </label>
-          <input id="eventTime"  type="time" placeholder="Time" class="w-full border p-2 outline-none">
-        </div> 
+          <div class="flex flex-col gap-1">
+              <label class="text-slate-400 font-poppins text-sm">Time</label>
+              <input id="eventTime" type="time" placeholder="Time" class="w-full border p-2 outline-none">
+          </div>
           
           <input id="eventLocation" placeholder="Location" class="w-full border p-2 outline-none">
-            <input id="eventImage" type="file" class="w-full border p-2 outline-none">
-            <div id="errorMessage" class="text-red-500 hidden"></div>
-
-            <div class=" flex justify-center gap-3 mt-3">
-
-                <button id="createEventBtn" class=" font-poppins bg-[#0043E2] text-white p-2 rounded-md px-4">Create Event </button>
-                <!-- <button class=" border bg-transparent p-2 rounded-md px-6">Edit Event </button> -->
-                
-            </div>
-
-
-
-        </div>
-
-
+          <input id="eventImage" type="file" class="w-full border p-2 outline-none">
+          
+          <div id="errorMessage" class="text-red-500 hidden"></div>
+          
+          <div class="flex justify-center gap-3 mt-3">
+              <button id="createEventBtn" class="bg-[#0043E2] text-white p-2 rounded-md px-4">Create Event</button>
+          </div>
       </div>
-    
-    
-    </div>
+  </div>
+</div>
 
 
        <!-- create event  -->
@@ -661,16 +635,16 @@
               </div>
 
 
-              <div class=" flex flex-col gap-4">
-
-                <h1> Join our community </h1>
-               <div class=" flex items-center border-white border ">
-                <input class=" flex-1 p-2 bg-transparent outline-none rounded-full  placeholder:text-white" placeholder="Enter your email">
-               <div class="  w-4 h-4 rounded-full border border-white">
-
-               </div> 
-              </div>
-
+              <div class="flex flex-col gap-4 w-full  ">
+                <h1 class=" text-center text-xl mb-4">Join our community</h1>
+              
+                <div class="flex flex-col items-center gap-3  border-white rounded-full ">
+                  <input autocomplete="off" id="emailInput" class=" p-2  text-black  " type="email" placeholder="Enter your email">
+                  <button type="button" id="joinButton" class="  text-black px-4 rounded-full bg-white   h-full">Join</button>
+                </div>
+              
+                <!-- Success and Error Messages -->
+                <p id="message" class="hidden mt-2 text-center"></p>
               </div>
 
             </div>
@@ -776,6 +750,57 @@
 <script type="module">
   import { db, collection, addDoc, query, where, orderBy, onSnapshot, getDocs } from './firebase.js';
   
+
+
+  // email adding 
+document.getElementById('joinButton').addEventListener('click', async () => {
+  console.log("clickedd");
+  
+    const emailInput = document.getElementById('emailInput');
+    const messageElement = document.getElementById('message');
+    const email = emailInput.value.trim();
+
+    if (!email) {
+      showMessage('Please enter a valid email address.', 'error');
+      return;
+    }
+
+    try {
+      // Check if the email already exists in the collection
+      const emailCollection = collection(db, 'emails');
+      const emailQuery = query(emailCollection, where('email', '==', email));
+      const querySnapshot = await getDocs(emailQuery);
+
+      if (!querySnapshot.empty) {
+        showMessage('Email already exist.', 'error');
+      } else {
+        // Add the email to the collection
+        await addDoc(emailCollection, { email });
+        showMessage('Email added successfully!', 'success');
+        emailInput.value = ''; // Clear the input after success
+      }
+    } catch (error) {
+      console.error('Error adding email:', error);
+      showMessage('An error occurred. Please try again.', 'error');
+    }
+  });
+
+  function showMessage(message, type) {
+    const messageElement = document.getElementById('message');
+    messageElement.textContent = message;
+    messageElement.classList.remove('hidden', 'text-green-500', 'text-red-500');
+    messageElement.classList.add(type === 'success' ? 'text-green-500' : 'text-red-500');
+
+    // Hide the message after 5 seconds
+    setTimeout(() => {
+      messageElement.classList.add('hidden');
+    }, 5000);
+  }
+// email adding 
+
+
+
+
   let currentUser = localStorage.getItem('email');
   let currentChatUser = null;
   const displayedMessages = new Set();
@@ -853,6 +878,9 @@
                 contactList.appendChild(contactElement);
             }
         });
+
+  
+
 
     } catch (error) {
         console.error('Error loading contacts:', error);
@@ -1042,6 +1070,11 @@
           const adminEmail = event.target.getAttribute('data-email');
           console.log('Admin Email:', adminEmail);
           
+          const email = localStorage.getItem("email")
+          if(adminEmail === email ) {
+            return
+          }
+          
           document.querySelector('#chatContainer').scrollIntoView({ behavior: 'smooth' });
           handleChatSelection(adminEmail); // Ensure the correct handling of chat selection
       }
@@ -1085,10 +1118,18 @@ const handleAdminChat = async (email) => {
 };
 
 
+
+
+
 // Event listener for admin chat button clicks
 document.body.addEventListener('click', (event) => {
     if (event.target.matches('.admin-chat-button')) {
         const adminEmail = event.target.getAttribute('data-email');
+
+        const email = localStorage.getItem("email")
+        if(adminEmail === email) {
+          return
+        }
         
         // Handle chat selection
         handleAdminChat(adminEmail);
@@ -1160,6 +1201,10 @@ document.querySelectorAll('.contact').forEach(el => el.classList.remove('selecte
 groupChatElement.classList.add('selected-contact');
 currentChatUser = 'Unterhaltung'; // Or the group chat ID
 loadGroupMessages('your-group-chat-id'); // Adjust based on your group chat structure
+
+
+
+
 
 
 
